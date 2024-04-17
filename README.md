@@ -1,3 +1,3 @@
 # projekat
 
-Projekat na predmetu Programske paradigme
+Projekat na predmetu Programske paradigme!
