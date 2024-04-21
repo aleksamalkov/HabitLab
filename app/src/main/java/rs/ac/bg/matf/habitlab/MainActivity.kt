@@ -1,6 +1,7 @@
 package rs.ac.bg.matf.habitlab
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -16,16 +17,22 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.room.RoomDatabase
+import rs.ac.bg.matf.habitlab.data.AppDatabase
+import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 
 class MainActivity : ComponentActivity() {
-    // lista taskova
-    private val binaryTasks = mutableStateListOf<BinaryTaskModel>()
-    // string koji upisujemo u polje
-    private val textFieldString = mutableStateOf<String>("")
+
+    lateinit var stateHolder: StateHolder
+    lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        db = AppDatabase.getInstance(applicationContext)
+        stateHolder = StateHolder(db.habitDao())
+
         setContent {
             HabitLabTheme {
                 // ovo je vljd za dizajn, nisam sigurna
@@ -33,28 +40,20 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        binaryTasks.forEach { task ->
+                        stateHolder.habits.forEach { task ->
                             BinaryTask(task.name)
                         }
 
                         Row {
                             AddTaskButton {
-                                addBinaryTask(textFieldString.value)
+                                stateHolder.addBinaryTask()
                             }
 
-                            TextField(value = textFieldString.value, onValueChange = {textFieldString.value = it})
+                            TextField(value = stateHolder.textFieldString.value, onValueChange = {stateHolder.textFieldString.value = it})
                         }
                     }
                 }
             }
-        }
-    }
-
-
-    private fun addBinaryTask(taskName: String) {
-        if (taskName.isNotBlank()) {
-            binaryTasks.add(BinaryTaskModel(taskName))
-            textFieldString.value = ""
         }
     }
 }
