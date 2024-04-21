@@ -29,6 +29,8 @@ class StateHolder (dao: HabitDao) : ViewModel() {
         habits.addAll(newHabits)
     }
 
+    // Moze se prosiriti u funkciju koja dodaje proizvoljnu naviku i poziva
+    // dataRepository.addNumericHabit(name, goal) ako se dodaje numericka
     fun addBinaryTask() {
         val taskName = textFieldString.value
         if (taskName.isNotBlank()) {
