@@ -13,18 +13,11 @@ interface OccurrenceDao {
         "FROM occurrence " +
         "WHERE habitId = :habitId AND date BETWEEN :from AND :until " +
         "ORDER BY date ")
-    fun getForHabit(habitId: Int, from: LocalDate, until: LocalDate): List<Occurrence>
-
-    @Query(
-        "SELECT * " +
-        "FROM occurrence " +
-        "WHERE habitId = :habitId " +
-        "ORDER BY date ")
-    fun getForHabit(habitId: Int): List<Occurrence>
+    suspend fun getForHabit(habitId: Int, from: LocalDate, until: LocalDate): List<Occurrence>
 
     @Upsert
-    fun upsert(occurrence: Occurrence)
+    suspend fun upsert(occurrence: Occurrence)
 
     @Delete
-    fun delete(occurrence: Occurrence)
+    suspend fun delete(occurrence: Occurrence)
 }

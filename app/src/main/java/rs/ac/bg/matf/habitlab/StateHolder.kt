@@ -9,9 +9,7 @@ import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.data.HabitDao
 
-class StateHolder (dao: HabitDao) : ViewModel() {
-
-    private val dataRepository = DataRepository(dao)
+class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // lista taskova
     val habits = mutableStateListOf<Habit>()
     // string koji upisujemo u polje

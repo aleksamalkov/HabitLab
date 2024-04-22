@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         db = AppDatabase.getInstance(applicationContext)
-        stateHolder = StateHolder(db.habitDao())
+        stateHolder = StateHolder(DataRepository(db.habitDao(), db.occurrenceDao()))
 
         setContent {
             HabitLabTheme {
