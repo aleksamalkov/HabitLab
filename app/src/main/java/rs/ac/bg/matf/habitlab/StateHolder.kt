@@ -20,6 +20,8 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     val checkedState = mutableStateMapOf<Habit, SnapshotStateList<Boolean>>()
     // string koji upisujemo u polje
     val textFieldString = mutableStateOf<String>("")
+    // string koji upisujemo u polje za goal
+    val goalString = mutableStateOf<String>("")
     // danasnji dan
     val today: LocalDate = LocalDate.now()
 
@@ -30,7 +32,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     }
 
     // dodavanje navike u bazu i osvezavanje interfejsa
-    fun addHabit(isNumeric: Boolean, goal: Int = 0) {
+    fun addHabit(isNumeric: Boolean, goal: Int = goalString.value.toInt()) {
         val taskName = textFieldString.value
         if (taskName.isNotBlank()) {
             textFieldString.value = ""
