@@ -3,7 +3,6 @@ package rs.ac.bg.matf.habitlab
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,16 +27,17 @@ import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Switch
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.content.Intent
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.TextButton
 
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +58,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    Column {
+                    Column (modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())){
                         ShowDays()
                         stateHolder.habits.forEach { task ->
                             if (task.isNumeric) {
@@ -94,10 +96,10 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .width(80.dp)
                                     .height(50.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 label = {Text("Goal")})
                         }
 
-                        OpenAnotherButton()
 
                     }
                 }
@@ -109,7 +111,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BinaryTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        Text(text = habit.name)
+        StatisticsButton(habitName = habit.name)
+//        Text(text = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
             repeat(7) { i ->
@@ -146,7 +149,7 @@ fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
 @Composable
 fun NumberTask(name: String) {
     Column {
-        Text(text = name)
+        StatisticsButton(habitName = name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
             repeat(7) {
@@ -183,12 +186,13 @@ fun ShowDays() {
 }
 
 @Composable
-fun OpenAnotherButton(){
+fun StatisticsButton(habitName:String){
     val mContext = LocalContext.current
-    Button(onClick = {
+    TextButton(onClick = {
         mContext.startActivity(Intent(mContext, StatisticsActivity::class.java))
-    }
-    ) {
-        Text("Go to Second Activity")
+    }) {
+        Text(text = habitName, 
+            style = TextStyle(fontSize = 20.sp)
+        )
     }
 }
