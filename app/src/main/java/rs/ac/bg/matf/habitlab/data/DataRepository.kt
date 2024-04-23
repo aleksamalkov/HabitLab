@@ -8,11 +8,11 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
 
     suspend fun addBinaryHabit(name: String) = habitDao.insert(Habit(name,false, null))
 
-    // nije testirano al treba da bude korisno kad se doda u UI
     suspend fun addNumericHabit(name: String, goal: Int) = habitDao.insert(Habit(name,true, goal))
 
     suspend fun removeHabit(habit: Habit) = habitDao.delete(habit)
 
+    // za naviku i vremenski period vraca niz int-ova koji pokazuju kojih dana je izvrsena i koliko
     suspend fun getNumericExecutions(habit: Habit, from: LocalDate, until: LocalDate): List<Int> {
         val executions = executionDao.getForHabit(habit.id, from, until)
         val result = mutableListOf<Int>()
@@ -35,6 +35,7 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
         return result
     }
 
+    // za naviku i vremenski period vraca niz bool-ova koji pokazuju kojih dana je izvrsena
     suspend fun getBinaryExecutions(habit: Habit, from: LocalDate, until: LocalDate): List<Boolean> {
         val executions = executionDao.getForHabit(habit.id, from, until)
         val result = mutableListOf<Boolean>()
@@ -57,6 +58,7 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
         return result
     }
 
+    // azurira da li je izvrsena odredjena binarna navika odredjenog dana
     suspend fun updateBinary(habit: Habit, date: LocalDate, value: Boolean) {
         val occurrence = Occurrence(habit.id, date, null)
         if (value) {
@@ -66,6 +68,7 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
         }
     }
 
+    // azurira broj izvrsavanja za odredjenu numericku naviku odredjenog dana
     suspend fun updateNumeric(habit: Habit, date: LocalDate, value: Int) {
         val occurrence = Occurrence(habit.id, date, value)
         if (value > 0) {
