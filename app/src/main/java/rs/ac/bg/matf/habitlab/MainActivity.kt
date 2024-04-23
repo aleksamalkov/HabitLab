@@ -1,7 +1,6 @@
 package rs.ac.bg.matf.habitlab
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -19,9 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.room.RoomDatabase
 import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
+import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
@@ -32,8 +31,8 @@ import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
 
-    lateinit var stateHolder: StateHolder
-    lateinit var db: AppDatabase
+    private lateinit var stateHolder: StateHolder
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,24 +48,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column {
                         stateHolder.habits.forEach { task ->
-                            BinaryTask(task.name)
-                            NumberTask(task.name)
-                            //svaki task treba da ima oznaku sta je
-                            // i onda se prikazuje samo ono sto treba
+                            if (task.isNumeric) {
+                                NumberTask(task.name)
+                            }
+                            else {
+                                BinaryTask(stateHolder, task)
+                            }
                         }
 
                         Row {
-                            var switchState = remember { mutableStateOf(false) }
+                            val switchState = remember { mutableStateOf(false) }
                             Switch(
                                 checked = switchState.value,
                                 onCheckedChange = { isChecked -> switchState.value = isChecked })
                             AddTaskButton {
-                                if (switchState.value){
-                                    stateHolder.addBinaryTask()
-                                }
-                                else{
-//                                  TODO stateHolder.addNumberTask()
-                                }
+                                // TODO ova funkcija opciono prihvata vrednost cilja kao drugi argument
+                                stateHolder.addHabit(!switchState.value)
                             }
 
                             TextField(value = stateHolder.textFieldString.value, onValueChange = {stateHolder.textFieldString.value = it})
@@ -78,30 +75,28 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ovo mi je delovalo kao jedina opcija da imam listu taskova
-data class BinaryTaskModel(val name: String)
-
 @Composable
-fun BinaryTask(name: String) {
+fun BinaryTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        Text(text = name)
+        Text(text = habit.name)
         Row {
-            repeat(7) {
-                val checkedState = remember { mutableStateOf(false) }
+            repeat(7) { i ->
                 Checkbox(
-                    checked = checkedState.value,
-                    onCheckedChange = { checkedState.value = it }
+                    checked = viewModel.checkedState[habit]?.get(i) ?: false,
+                    onCheckedChange = {
+                        viewModel.onCheckedChange(habit, i, it)
+                    }
                 )
             }
         }
     }
 }
 
-@Preview
-@Composable
-fun BinaryTaskPreview(){
-    BinaryTask("Task za preview")
-}
+//@Preview
+//@Composable
+//fun BinaryTaskPreview(){
+//    BinaryTask("Task za preview")
+//}
 
 @Composable
 fun AddTaskButton(onClick: () -> Unit) {
@@ -110,6 +105,8 @@ fun AddTaskButton(onClick: () -> Unit) {
     }
 }
 
+// TODO ovo treba promeniti tako da se stanje cuva u StateHolder klasi i poziva funkcija odande
+// TODO  za on value change, slicno kao kod BinaryTask
 @Composable
 fun NumberTask(name: String) {
     Column {

@@ -16,6 +16,7 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
     suspend fun getNumericExecutions(habit: Habit, from: LocalDate, until: LocalDate): List<Int> {
         val executions = executionDao.getForHabit(habit.id, from, until)
         val result = mutableListOf<Int>()
+
         var date = from
         for (e in executions) {
             while (date.isBefore(e.date)) {
@@ -25,13 +26,19 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
             result.add(e.count ?: 0)
             date = date.plusDays(1)
         }
-        assert(result.size.toLong() == Duration.between(from, until).toDays() + 1)
-        return result;
+        while (!date.isAfter(until)) {
+            result.add(0)
+            date = date.plusDays(1)
+        }
+
+        assert(result.size.toLong() == Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1)
+        return result
     }
 
     suspend fun getBinaryExecutions(habit: Habit, from: LocalDate, until: LocalDate): List<Boolean> {
         val executions = executionDao.getForHabit(habit.id, from, until)
         val result = mutableListOf<Boolean>()
+
         var date = from
         for (e in executions) {
             while (date.isBefore(e.date)) {
@@ -41,7 +48,30 @@ class DataRepository (private val habitDao: HabitDao, private val executionDao: 
             result.add(true)
             date = date.plusDays(1)
         }
-        assert(result.size.toLong() == Duration.between(from, until).toDays() + 1)
-        return result;
+        while (!date.isAfter(until)) {
+            result.add(false)
+            date = date.plusDays(1)
+        }
+
+        assert(result.size.toLong() == Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1)
+        return result
+    }
+
+    suspend fun updateBinary(habit: Habit, date: LocalDate, value: Boolean) {
+        val occurrence = Occurrence(habit.id, date, null)
+        if (value) {
+            executionDao.upsert(occurrence)
+        } else {
+            executionDao.delete(occurrence)
+        }
+    }
+
+    suspend fun updateNumeric(habit: Habit, date: LocalDate, value: Int) {
+        val occurrence = Occurrence(habit.id, date, value)
+        if (value > 0) {
+            executionDao.upsert(occurrence)
+        } else {
+            executionDao.delete(occurrence)
+        }
     }
 }
