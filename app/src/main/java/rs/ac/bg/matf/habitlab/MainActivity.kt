@@ -29,11 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Switch
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.content.Intent
 
 
 class MainActivity : ComponentActivity() {
@@ -65,7 +69,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        Row (modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                        Row (modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween){
                             val switchState = remember { mutableStateOf(false) }
                             Switch(
@@ -78,14 +84,21 @@ class MainActivity : ComponentActivity() {
 
                             TextField(value = stateHolder.textFieldString.value,
                                 onValueChange = {stateHolder.textFieldString.value = it},
-                                modifier = Modifier.width(120.dp).height(50.dp),
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(50.dp),
                                 label = {Text("Name")})
 
                             TextField(value = stateHolder.goalString.value,
                                 onValueChange = {stateHolder.goalString.value = it},
-                                modifier = Modifier.width(80.dp).height(50.dp),
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .height(50.dp),
                                 label = {Text("Goal")})
                         }
+
+                        OpenAnotherButton()
+
                     }
                 }
             }
@@ -143,7 +156,8 @@ fun NumberTask(name: String) {
                     value = textState.value,
                     onValueChange = { textState.value = it },
                     textStyle = TextStyle(fontSize = 14.sp),
-                    modifier = Modifier.width(50.dp)
+                    modifier = Modifier.width(50.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
         }
@@ -158,12 +172,23 @@ fun NumberTaskPreview(){
 
 @Composable
 fun ShowDays() {
-    val today = LocalDate.now()
+    val firstDayToShow = LocalDate.now().minusDays(6)
     val formatter = DateTimeFormatter.ofPattern("dd.MM.")
     Row (modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween){
         repeat(7) {it ->
-            Text(text = today.minusDays(it.toLong()).format(formatter))
+            Text(text = firstDayToShow.plusDays(it.toLong()).format(formatter))
         }
+    }
+}
+
+@Composable
+fun OpenAnotherButton(){
+    val mContext = LocalContext.current
+    Button(onClick = {
+        mContext.startActivity(Intent(mContext, StatisticsActivity::class.java))
+    }
+    ) {
+        Text("Go to Second Activity")
     }
 }
