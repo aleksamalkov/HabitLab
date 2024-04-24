@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                         ShowDays()
                         stateHolder.habits.forEach { task ->
                             if (task.isNumeric) {
-                                NumberTask(task.name)
+                                NumberTask(stateHolder, task)
                             }
                             else {
                                 BinaryTask(stateHolder, task)
@@ -147,17 +147,16 @@ fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
 // TODO ovo treba promeniti tako da se stanje cuva u StateHolder klasi i poziva funkcija odande
 // TODO  za on value change, slicno kao kod BinaryTask
 @Composable
-fun NumberTask(name: String) {
+fun NumberTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsButton(habitName = name)
+        StatisticsButton(habitName = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
-            repeat(7) {
-                val textState = remember { mutableStateOf("") }
+            repeat(7) {i ->
 
                 TextField(
-                    value = textState.value,
-                    onValueChange = { textState.value = it },
+                    value = if (viewModel.numbersState[habit]?.get(i).toString() == "0")  "" else viewModel.numbersState[habit]?.get(i).toString() ,
+                    onValueChange = { viewModel.onValueChange(habit, i, it)},
                     textStyle = TextStyle(fontSize = 14.sp),
                     modifier = Modifier.width(50.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -167,11 +166,11 @@ fun NumberTask(name: String) {
     }
 }
 
-@Preview
-@Composable
-fun NumberTaskPreview(){
-    NumberTask("pokusaj")
-}
+//@Preview
+//@Composable
+//fun NumberTaskPreview(){
+//    NumberTask("pokusaj")
+//}
 
 @Composable
 fun ShowDays() {

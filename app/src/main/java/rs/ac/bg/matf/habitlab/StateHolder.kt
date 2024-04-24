@@ -18,6 +18,8 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     val habits = mutableStateListOf<Habit>()
     // stanje checkboxova TODO dodati slicno za numericke
     val checkedState = mutableStateMapOf<Habit, SnapshotStateList<Boolean>>()
+    // stanje textfieldova za numericke taskove
+    val numbersState = mutableStateMapOf<Habit, SnapshotStateList<Int>>()
     // string koji upisujemo u polje
     val textFieldString = mutableStateOf<String>("")
     // string koji upisujemo u polje za goal
@@ -36,6 +38,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
         val taskName = textFieldString.value
         if (taskName.isNotBlank()) {
             textFieldString.value = ""
+            goalString.value = ""
             viewModelScope.launch {
                 if (isNumeric) {
                     dataRepository.addNumericHabit(taskName, goal)
@@ -57,13 +60,29 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
         }
     }
 
+    fun onValueChange(habit: Habit, i: Int, value: String){
+        val date = today.minusDays((6 - i).toLong())
+        viewModelScope.launch {
+            if(value == ""){
+                dataRepository.updateNumeric(habit, date, 0)
+            }
+            else{
+                dataRepository.updateNumeric(habit, date, value.toInt())
+            }
+            refreshNumeric(habit)
+        }
+    }
+
     // osvezavanje liste navika
     // poziva se kada se otvra activity i kada se dodaje/uklanja navika
     // TODO dodati osvezavanje numerickih navika kada se implementira
     private suspend fun refresh() {
         val newHabits = dataRepository.allHabits()
         for (habit in newHabits) {
-            refreshBinary(habit)
+            if (habit.isNumeric)
+                refreshNumeric(habit)
+            else
+                refreshBinary(habit)
         }
         habits.clear()
         habits.addAll(newHabits)
@@ -76,5 +95,12 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
         val newExecs = dataRepository.getBinaryExecutions(habit, today.minusDays(6), today)
         execs.addAll(newExecs)
         checkedState[habit] = execs
+    }
+
+    private suspend fun refreshNumeric(habit: Habit){
+        val execs = mutableStateListOf<Int>()
+        val newExecs = dataRepository.getNumericExecutions(habit, today.minusDays(6), today)
+        execs.addAll(newExecs)
+        numbersState[habit] = execs
     }
 }
