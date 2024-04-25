@@ -75,4 +75,11 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
     // Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
+
+    //za kalendar
+    implementation("com.maxkeppeler.sheets-compose-dialogs:core:1.3.0")
+    implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.3.0")
+
+    //za pie chart
+    implementation ("co.yml:ycharts:2.1.0")
 }
