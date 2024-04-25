@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
@@ -111,7 +110,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BinaryTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsButton(habitName = habit.name)
+        StatisticsBinaryButton(habitName = habit.name)
 //        Text(text = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
@@ -149,7 +148,7 @@ fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
 @Composable
 fun NumberTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsButton(habitName = habit.name)
+        StatisticsNumberButton(habitName = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
             repeat(7) {i ->
@@ -185,12 +184,24 @@ fun ShowDays() {
 }
 
 @Composable
-fun StatisticsButton(habitName:String){
+fun StatisticsBinaryButton(habitName:String){
     val mContext = LocalContext.current
     TextButton(onClick = {
         mContext.startActivity(Intent(mContext, StatisticsActivity::class.java))
     }) {
         Text(text = habitName, 
+            style = TextStyle(fontSize = 20.sp)
+        )
+    }
+}
+
+@Composable
+fun StatisticsNumberButton(habitName: String){
+    val mContext = LocalContext.current
+    TextButton(onClick = {
+        mContext.startActivity(Intent(mContext, StatisticsNumberActivity::class.java))
+    }) {
+        Text(text = habitName,
             style = TextStyle(fontSize = 20.sp)
         )
     }

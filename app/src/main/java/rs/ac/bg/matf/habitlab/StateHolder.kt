@@ -13,6 +13,7 @@ import rs.ac.bg.matf.habitlab.data.HabitDao
 import rs.ac.bg.matf.habitlab.data.Occurrence
 import java.time.LocalDate
 
+
 class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // lista taskova
     val habits = mutableStateListOf<Habit>()
@@ -34,7 +35,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     }
 
     // dodavanje navike u bazu i osvezavanje interfejsa
-    fun addHabit(isNumeric: Boolean, goal: Int = goalString.value.toInt()) {
+    fun addHabit(isNumeric: Boolean, goal: Int = 0) {
         val taskName = textFieldString.value
         if (taskName.isNotBlank()) {
             textFieldString.value = ""

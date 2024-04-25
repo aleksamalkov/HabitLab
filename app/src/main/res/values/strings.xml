@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">HabitLab</string>
     <string name="title_activity_statistics">StatisticsActivity</string>
+    <string name="title_activity_statistics_number">StatisticsNumberActivity</string>
 </resources>
