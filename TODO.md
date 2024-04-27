@@ -2,7 +2,7 @@
 
 ## MainActivity
 - [x] pravljenje nove navike tako da korisnik moze da izabere da li je numericka ili binarna
-- [ ] unosenje cilja za numericke (Isidora)
+- [x] unosenje cilja za numericke (Isidora)
 - [x] ispisivanje datuma i/ili dana u nedelji
 - [x] cuvanje izvrsavanja navika u bazi
 - [x] cuvanje izvrsavanja numerickih navika u bazi
@@ -11,7 +11,7 @@
 - [x] pokretanje drugog activity-a kada se klikne naziv neke navike
 - [x] slanje habit objekta activity-u koji se pokrece
 - [ ] prikazivanje 0
-- [ ] delovi koji ne treba da se skroluju (Isidora)
+- [x] delovi koji ne treba da se skroluju (Isidora)
 
 ## StatisticsActivity
 drugi activity koji ce prikazivati statistike za neku konkretnu naviku
