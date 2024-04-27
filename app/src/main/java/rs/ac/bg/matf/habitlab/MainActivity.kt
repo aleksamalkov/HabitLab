@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BinaryTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsBinaryButton(habitName = habit.name)
+        StatisticsBinaryButton(habit)
 //        Text(text = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
@@ -184,12 +184,14 @@ fun ShowDays() {
 }
 
 @Composable
-fun StatisticsBinaryButton(habitName:String){
+fun StatisticsBinaryButton(habit: Habit){
     val mContext = LocalContext.current
     TextButton(onClick = {
-        mContext.startActivity(Intent(mContext, StatisticsActivity::class.java))
+        mContext.startActivity(Intent(mContext, StatisticsActivity::class.java).apply {
+            putExtra("habit", habit)
+        })
     }) {
-        Text(text = habitName, 
+        Text(text = habit.name,
             style = TextStyle(fontSize = 20.sp)
         )
     }

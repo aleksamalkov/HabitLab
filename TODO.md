@@ -9,7 +9,7 @@
 - [x] skrolovanje dugacke liste navika
 - [x] text field za brojeve
 - [x] pokretanje drugog activity-a kada se klikne naziv neke navike
-- [ ] slanje habit objekta activity-u koji se pokrece (maki)
+- [x] slanje habit objekta activity-u koji se pokrece
 - [ ] prikazivanje 0
 - [ ] delovi koji ne treba da se skroluju (Isidora)
 

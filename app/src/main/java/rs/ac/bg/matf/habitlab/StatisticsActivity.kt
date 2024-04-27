@@ -43,6 +43,7 @@ import com.maxkeppeler.sheets.calendar.CalendarView
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import java.time.LocalDate
 
@@ -50,6 +51,9 @@ class StatisticsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val habit = intent.getSerializableExtra("habit") as Habit
+
         setContent {
             HabitLabTheme {
                 // A surface container using the 'background' color from the theme
@@ -58,7 +62,7 @@ class StatisticsActivity : ComponentActivity() {
                 ) {
                     Column{
                         Text(
-                            text = "Trcanje",
+                            text = habit.name,
                             fontSize = 50.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
