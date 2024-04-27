@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.PieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
@@ -43,16 +44,24 @@ import com.maxkeppeler.sheets.calendar.CalendarView
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import rs.ac.bg.matf.habitlab.data.AppDatabase
+import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import java.time.LocalDate
 
 class StatisticsActivity : ComponentActivity() {
+    private lateinit var db: AppDatabase
+    private lateinit var viewModel: StatisticsViewModel
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val habit = intent.getSerializableExtra("habit") as Habit
+        db = AppDatabase.getInstance(applicationContext)
+        viewModel = StatisticsViewModel(
+            DataRepository(db.habitDao(), db.occurrenceDao()),
+            intent.getSerializableExtra("habit") as Habit
+        )
 
         setContent {
             HabitLabTheme {
@@ -62,7 +71,7 @@ class StatisticsActivity : ComponentActivity() {
                 ) {
                     Column{
                         Text(
-                            text = habit.name,
+                            text = viewModel.habit.name,
                             fontSize = 50.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
