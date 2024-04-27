@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var stateHolder: StateHolder
     private lateinit var db: AppDatabase
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -60,9 +62,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.padding(10.dp)
                 ) {
                     LazyColumn (modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())){
-                        item{ShowDays()}
+                        .fillMaxWidth()){
+                        stickyHeader{ShowDays()}
                         items(stateHolder.habits){task ->
                             if (task.isNumeric) {
                                 NumberTask(stateHolder, task)
