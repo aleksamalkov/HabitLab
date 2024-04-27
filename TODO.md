@@ -13,23 +13,33 @@
 - [ ] prikazivanje 0
 - [ ] delovi koji ne treba da se skroluju (Isidora)
 
-## drugi activity
+## StatisticsActivity
 drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 - [x] napraviti klasu za activity
-- [ ] napraviti klasu koja nasledjuje ViewModel u kojoj ce se cuvati stanje (maki)
-- [ ] naziv navike
+- [x] napraviti klasu koja nasledjuje ViewModel u kojoj ce se cuvati stanje
+- [x] naziv navike
 - [ ] cilj za numercike navike
 - [ ] kalendar
     - [x] UI
-    - [ ] data
+    - [x] data
+    - [ ] smisliti sta cemo sa cancel i ok i sta treba da se desi kad klikcemo polja
 - [ ] pie chart
     - [x] UI
-    - [ ] data
+    - [x] data
+    - [ ] biranje perioda
 - [ ] bar chart
     - [x] UI
     - [ ] data
-- [ ] streak (trenutni i/ili najbolji)
+- [ ] streak (trenutni i/ili najbolji) (mozda nam i ne treba?)
 - [x] dugme za vracanje na MainActivity (pozivom funkcije finish())
 - [ ] dugme za brisanje navike
-- [ ] polozaji i ikonice dugmica
-- [ ] skrolovanje stvari
+    - [x] UI
+    - [ ] implementacija
+- [ ] polozaji i ikonice dugmica (Iva)
+- [ ] skrolovanje stvari (Iva)
+- [ ] spojiti dva aktivitija
+
+## Ostalo
+- [ ] popraviti pozadinu kad je ukljucena tamna tema
+- [ ] napisati README.md
+- [ ] prebaciti repo na public

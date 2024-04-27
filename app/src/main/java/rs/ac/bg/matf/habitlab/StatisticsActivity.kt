@@ -78,18 +78,8 @@ class StatisticsActivity : ComponentActivity() {
                                 .wrapContentSize(Alignment.Center)
                         )
 
-                    //ovo treba da bude lista dana kad je odradjena navika
-                        var selectedDates = remember {
-                            mutableStateListOf<LocalDate>(
-                                LocalDate.now().minusDays(3),
-                                LocalDate.now().minusDays(2),
-                                LocalDate.now().minusDays(10),
-                                LocalDate.now().minusDays(9),
-                                LocalDate.now().minusDays(7)
-                            )
-                        }
-                        ShowCalendar(selectedDate = selectedDates)
-                        ShowPie()
+                        ShowCalendar(selectedDate = viewModel.doneDates)
+                        ShowPie(viewModel)
 
                         Row{
                             ReturnButton()
@@ -144,7 +134,7 @@ fun ShowCalendar(selectedDate: SnapshotStateList<LocalDate> ){
 }
 
 @Composable
-fun ShowPie() {
+fun ShowPie(viewModel: StatisticsViewModel) {
     val showDialog = remember {mutableStateOf(false)}
 
     Column {
@@ -167,17 +157,16 @@ fun ShowPie() {
     }
 
     if (showDialog.value) {
-        ShowPieChart()
+        ShowPieChart(viewModel)
     }
 }
 
-// TODO da se napravi da prima listu kad je uradjeno i na osnovu nje napravi pie chart
 @Composable
-fun ShowPieChart(){
+fun ShowPieChart(viewModel: StatisticsViewModel){
     val pieChartData = PieChartData(
         slices = listOf(
-            PieChartData.Slice("Uradjeno", 65f, Color(0xFF333333)),
-            PieChartData.Slice("Nije", 35f, Color(0xFF666a86))
+            PieChartData.Slice("Uradjeno", viewModel.pieRatio.floatValue * 100, Color(0xFF333333)),
+            PieChartData.Slice("Nije", (1 - viewModel.pieRatio.floatValue) * 100, Color(0xFF666a86))
 
         ),
         plotType = PlotType.Pie
