@@ -35,8 +35,11 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     }
 
     // dodavanje navike u bazu i osvezavanje interfejsa
-    fun addHabit(isNumeric: Boolean, goal: Int = 0) {
+    fun addHabit(isNumeric: Boolean) {
         val taskName = textFieldString.value
+        var goal = 0
+        if (isNumeric && goalString.value != "")
+            goal = goalString.value.toInt()
         if (taskName.isNotBlank()) {
             textFieldString.value = ""
             goalString.value = ""

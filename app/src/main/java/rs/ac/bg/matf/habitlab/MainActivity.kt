@@ -34,7 +34,9 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.content.Intent
+import android.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -103,8 +105,10 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .width(80.dp)
                                         .height(50.dp),
+                                    enabled = !(switchState.value),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     label = { Text("Goal") })
+
                             }
                         }
 
