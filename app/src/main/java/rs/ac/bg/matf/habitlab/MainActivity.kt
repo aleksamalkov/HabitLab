@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.content.Intent
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.TextButton
@@ -57,11 +59,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    Column (modifier = Modifier
+                    LazyColumn (modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())){
-                        ShowDays()
-                        stateHolder.habits.forEach { task ->
+                        item{ShowDays()}
+                        items(stateHolder.habits){task ->
                             if (task.isNumeric) {
                                 NumberTask(stateHolder, task)
                             }
@@ -70,35 +72,40 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        Row (modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween){
-                            val switchState = remember { mutableStateOf(false) }
-                            Switch(
-                                checked = switchState.value,
-                                onCheckedChange = { isChecked -> switchState.value = isChecked })
-                            AddTaskButton(switchState.value) {
-                                // TODO ova funkcija opciono prihvata vrednost cilja kao drugi argument
-                                stateHolder.addHabit(!switchState.value)
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val switchState = remember { mutableStateOf(false) }
+                                Switch(
+                                    checked = switchState.value,
+                                    onCheckedChange = { isChecked ->
+                                        switchState.value = isChecked
+                                    })
+                                AddTaskButton(switchState.value) {
+                                    // TODO ova funkcija opciono prihvata vrednost cilja kao drugi argument
+                                    stateHolder.addHabit(!switchState.value)
+                                }
+
+                                TextField(value = stateHolder.textFieldString.value,
+                                    onValueChange = { stateHolder.textFieldString.value = it },
+                                    modifier = Modifier
+                                        .width(120.dp)
+                                        .height(50.dp),
+                                    label = { Text("Name") })
+
+                                TextField(value = stateHolder.goalString.value,
+                                    onValueChange = { stateHolder.goalString.value = it },
+                                    modifier = Modifier
+                                        .width(80.dp)
+                                        .height(50.dp),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    label = { Text("Goal") })
                             }
-
-                            TextField(value = stateHolder.textFieldString.value,
-                                onValueChange = {stateHolder.textFieldString.value = it},
-                                modifier = Modifier
-                                    .width(120.dp)
-                                    .height(50.dp),
-                                label = {Text("Name")})
-
-                            TextField(value = stateHolder.goalString.value,
-                                onValueChange = {stateHolder.goalString.value = it},
-                                modifier = Modifier
-                                    .width(80.dp)
-                                    .height(50.dp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                label = {Text("Goal")})
                         }
-
 
                     }
                 }
