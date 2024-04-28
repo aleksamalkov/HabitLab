@@ -37,11 +37,19 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.TextButton
+import rs.ac.bg.matf.habitlab.ui.theme.NewPink
+import rs.ac.bg.matf.habitlab.ui.theme.Pink40
 
 
 class MainActivity : ComponentActivity() {
@@ -60,11 +68,11 @@ class MainActivity : ComponentActivity() {
             HabitLabTheme {
                 // ovo je vljd za dizajn, nisam sigurna
                 Surface(
-                    color = MaterialTheme.colorScheme.background,
-                    modifier = Modifier.padding(10.dp)
+                    color = NewPink
                 ) {
                     LazyColumn (modifier = Modifier
-                        .fillMaxWidth()){
+                        .fillMaxWidth()
+                        .padding(10.dp)){
                         stickyHeader{ShowDays()}
                         items(stateHolder.habits){task ->
                             if (task.isNumeric) {
@@ -73,13 +81,14 @@ class MainActivity : ComponentActivity() {
                             else {
                                 BinaryTask(stateHolder, task)
                             }
+                            Divider(thickness = 3.dp)
                         }
 
                         item {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 10.dp),
+                                    .padding(top = 10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 val switchState = remember { mutableStateOf(false) }
@@ -122,7 +131,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BinaryTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsBinaryButton(habit)
+        StatisticsButton(habit)
 //        Text(text = habit.name)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
@@ -131,7 +140,8 @@ fun BinaryTask(viewModel: StateHolder, habit: Habit) {
                     checked = viewModel.checkedState[habit]?.get(i) ?: false,
                     onCheckedChange = {
                         viewModel.onCheckedChange(habit, i, it)
-                    }
+                    },
+                            colors = CheckboxDefaults.colors()//checkboxColors(containerColor = Pink40)
                 )
             }
         }
@@ -147,11 +157,16 @@ fun BinaryTask(viewModel: StateHolder, habit: Habit) {
 @Composable
 fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
     Button(onClick = onClick,
-        modifier = Modifier.width(120.dp)) {
-        if (isBinary)
+        modifier = Modifier.width(120.dp),
+        colors = ButtonDefaults.buttonColors(Pink40)
+    ) {
+        if (isBinary) {
             Text(text = "+ Binary")
-        else
+
+        }
+        else {
             Text(text = "+ Numeric")
+        }
     }
 }
 
@@ -160,7 +175,7 @@ fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
 @Composable
 fun NumberTask(viewModel: StateHolder, habit: Habit) {
     Column {
-        StatisticsNumberButton(habitName = habit.name)
+        StatisticsButton(habit)
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
             repeat(7) {i ->
@@ -169,7 +184,9 @@ fun NumberTask(viewModel: StateHolder, habit: Habit) {
                     value = if (viewModel.numbersState[habit]?.get(i).toString() == "0")  "" else viewModel.numbersState[habit]?.get(i).toString() ,
                     onValueChange = { viewModel.onValueChange(habit, i, it)},
                     textStyle = TextStyle(fontSize = 14.sp),
-                    modifier = Modifier.width(50.dp),
+                    modifier = Modifier
+                        .width(50.dp)
+                        .padding(bottom = 7.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -196,7 +213,7 @@ fun ShowDays() {
 }
 
 @Composable
-fun StatisticsBinaryButton(habit: Habit){
+fun StatisticsButton(habit: Habit){
     val mContext = LocalContext.current
     TextButton(onClick = {
         mContext.startActivity(Intent(mContext, StatisticsActivity::class.java).apply {
@@ -204,19 +221,9 @@ fun StatisticsBinaryButton(habit: Habit){
         })
     }) {
         Text(text = habit.name,
-            style = TextStyle(fontSize = 20.sp)
+            style = TextStyle(fontSize = 20.sp),
+            color = androidx.compose.ui.graphics.Color.Black
         )
     }
 }
 
-@Composable
-fun StatisticsNumberButton(habitName: String){
-    val mContext = LocalContext.current
-    TextButton(onClick = {
-        mContext.startActivity(Intent(mContext, StatisticsNumberActivity::class.java))
-    }) {
-        Text(text = habitName,
-            style = TextStyle(fontSize = 20.sp)
-        )
-    }
-}
