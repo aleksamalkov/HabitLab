@@ -35,11 +35,12 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 - [ ] dugme za brisanje navike
     - [x] UI
     - [ ] implementacija
-- [ ] polozaji i ikonice dugmica (Iva)
-- [ ] skrolovanje stvari (Iva)
-- [ ] spojiti dva aktivitija
+- [x] polozaji i ikonice dugmica (Iva)
+- [x] skrolovanje stvari (Iva)
+- [x] spojiti dva aktivitija
 
 ## Ostalo
-- [ ] popraviti pozadinu kad je ukljucena tamna tema
+- [x] popraviti pozadinu kad je ukljucena tamna tema
+- [ ] materialTheme cudno ponasanje
 - [ ] napisati README.md
 - [ ] prebaciti repo na public
