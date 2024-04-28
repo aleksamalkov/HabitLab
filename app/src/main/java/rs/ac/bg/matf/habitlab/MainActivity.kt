@@ -47,6 +47,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import rs.ac.bg.matf.habitlab.ui.theme.NewPink
 import rs.ac.bg.matf.habitlab.ui.theme.Pink40
@@ -68,23 +70,12 @@ class MainActivity : ComponentActivity() {
             HabitLabTheme {
                 // ovo je vljd za dizajn, nisam sigurna
                 Surface(
-                    color = NewPink
+                    color = MaterialTheme.colorScheme.background,
                 ) {
-                    LazyColumn (modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)){
-                        stickyHeader{ShowDays()}
-                        items(stateHolder.habits){task ->
-                            if (task.isNumeric) {
-                                NumberTask(stateHolder, task)
-                            }
-                            else {
-                                BinaryTask(stateHolder, task)
-                            }
-                            Divider(thickness = 3.dp)
-                        }
-
-                        item {
+                    Scaffold (
+                        Modifier.padding(10.dp),
+                        topBar = {ShowDays()},
+                        bottomBar = {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -120,7 +111,22 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
+                    ) { innerPadding ->
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(innerPadding)
+                        ) {
+                            items(stateHolder.habits) { task ->
+                                if (task.isNumeric) {
+                                    NumberTask(stateHolder, task)
+                                } else {
+                                    BinaryTask(stateHolder, task)
+                                }
+                                HorizontalDivider(thickness = 3.dp)
+                            }
 
+                        }
                     }
                 }
             }
