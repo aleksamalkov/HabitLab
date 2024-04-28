@@ -39,7 +39,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
         val taskName = textFieldString.value
         var goal = 0
         if (isNumeric && goalString.value != "")
-            goal = goalString.value.toInt()
+            goal = goalString.value.trim().toInt()
         if (taskName.isNotBlank()) {
             textFieldString.value = ""
             goalString.value = ""
@@ -71,7 +71,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
                 dataRepository.updateNumeric(habit, date, 0)
             }
             else{
-                dataRepository.updateNumeric(habit, date, value.toInt())
+                dataRepository.updateNumeric(habit, date, value.trim().toInt())
             }
             refreshNumeric(habit)
         }

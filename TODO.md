@@ -13,7 +13,7 @@
 - [ ] prikazivanje 0 (mozda i bolje ovako?)
 - [x] delovi koji ne treba da se skroluju
 - [x] red sa datumima ne treba da bude providan
-- [ ] aplikacija puca kada se text field za broj unese enter?
+- [x] aplikacija puca kada se text field za broj unese enter?
 
 ## StatisticsActivity
 drugi activity koji ce prikazivati statistike za neku konkretnu naviku
