@@ -10,9 +10,10 @@
 - [x] text field za brojeve
 - [x] pokretanje drugog activity-a kada se klikne naziv neke navike
 - [x] slanje habit objekta activity-u koji se pokrece
-- [ ] prikazivanje 0
+- [ ] prikazivanje 0 (mozda i bolje ovako?)
 - [x] delovi koji ne treba da se skroluju
 - [ ] pozadina za red sa datumima
+- [ ] aplikacija puca kada se text field za broj unese enter?
 
 ## StatisticsActivity
 drugi activity koji ce prikazivati statistike za neku konkretnu naviku
@@ -30,12 +31,15 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
     - [ ] biranje perioda
 - [ ] bar chart
     - [x] UI
-    - [ ] data
+    - [x] data
+    - [ ] skaliranje y ose za velike brojeve
+    - [ ] biranje perioda
 - [ ] streak (trenutni i/ili najbolji) (mozda nam i ne treba?)
 - [x] dugme za vracanje na MainActivity (pozivom funkcije finish())
-- [x] dugme za brisanje navike
+- [ ] dugme za brisanje navike
     - [x] UI
     - [x] implementacija
+    - [ ] "da li ste sigurni?" dijalog
 - [x] polozaji i ikonice dugmica (Iva)
 - [x] skrolovanje stvari (Iva)
 - [x] spojiti dva aktivitija
@@ -45,3 +49,4 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 - [ ] materialTheme cudno ponasanje
 - [ ] napisati README.md
 - [ ] prebaciti repo na public
+    - [ ] preimenovati repozitorijum

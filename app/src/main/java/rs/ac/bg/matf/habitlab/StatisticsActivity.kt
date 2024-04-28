@@ -1,28 +1,22 @@
 package rs.ac.bg.matf.habitlab
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,26 +28,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import co.yml.charts.axis.AxisData
-import co.yml.charts.axis.DataCategoryOptions
 import co.yml.charts.common.model.PlotType
-import co.yml.charts.common.utils.DataUtils
+import co.yml.charts.common.model.Point
 import co.yml.charts.ui.barchart.BarChart
 import co.yml.charts.ui.barchart.models.BarChartData
-import co.yml.charts.ui.barchart.models.BarChartType
+import co.yml.charts.ui.barchart.models.BarData
 import co.yml.charts.ui.piechart.charts.PieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
@@ -69,15 +58,17 @@ import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import rs.ac.bg.matf.habitlab.ui.theme.NewPink
 import rs.ac.bg.matf.habitlab.ui.theme.Pink40
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class StatisticsActivity : ComponentActivity() {
     private lateinit var db: AppDatabase
     private lateinit var viewModel: StatisticsViewModel
-    @OptIn(ExperimentalMaterial3Api::class)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         db = AppDatabase.getInstance(applicationContext)
+        @Suppress("DEPRECATION")
         viewModel = StatisticsViewModel(
             DataRepository(db.habitDao(), db.occurrenceDao()),
             intent.getSerializableExtra("habit") as Habit
@@ -122,7 +113,7 @@ class StatisticsActivity : ComponentActivity() {
                                 }
                             }
                             if (viewModel.habit.isNumeric) {
-                                item { ShowBar() }
+                                item { ShowBar(viewModel) }
                             } else {
                                 item { ShowPie(viewModel) }
 
@@ -143,7 +134,7 @@ fun ReturnButton() {
         modifier = Modifier.size(60.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Unazad",
             modifier = Modifier.size(50.dp)
         )
@@ -195,7 +186,7 @@ fun ShowPie(viewModel: StatisticsViewModel) {
 
     Column {
         //TODO da se napravi funkcikonalnost ovom textfieldu
-        Row() {
+        Row {
             Spacer(modifier = Modifier.width(20.dp))
             TextField(
                 value = "",
@@ -265,7 +256,7 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
 }
 
 @Composable
-fun ShowBar() {
+fun ShowBar(viewModel: StatisticsViewModel) {
     val showDialog = remember { mutableStateOf(false) }
 
     Column {
@@ -294,22 +285,34 @@ fun ShowBar() {
             }
 
         }
-        ShowBarChart()
+        ShowBarChart(viewModel)
         if (showDialog.value) {
-            ShowBarChart()
+            ShowBarChart(viewModel)
         }
     }
 }
 
 @Composable
-fun ShowBarChart(){
-    val stepSize = 5
-    val barsData = DataUtils.getBarChartData(
-        listSize = 8,
-        maxRange = 8,
-        barChartType = BarChartType.VERTICAL,
-        dataCategoryOptions = DataCategoryOptions()
-    )
+fun ShowBarChart(viewModel: StatisticsViewModel){
+    val data = viewModel.barData
+    if (data.isEmpty()) {
+        data.add(0)
+    }
+
+    val barsData = mutableListOf<BarData>()
+
+    var date = viewModel.month.atDay(1)
+    var x = 0f
+    val formatter = DateTimeFormatter.ofPattern("MM-dd")
+    for (i in data) {
+        barsData.add(BarData(
+            Point(x, i.toFloat()),
+            color = MaterialTheme.colorScheme.onPrimary,
+            label = date.format(formatter),
+        ))
+        x += 1f
+        date = date.plusDays(1)
+    }
 
     val xAxisData = AxisData.Builder()
         .axisStepSize(30.dp)
@@ -320,11 +323,13 @@ fun ShowBarChart(){
         .backgroundColor(NewPink)
         .build()
 
+    // TODO popraviti za veliko max
+    val max = data.maxOrNull() ?: 1
     val yAxisData = AxisData.Builder()
-        .steps(stepSize)
+        .steps(max)
         .labelAndAxisLinePadding(20.dp)
         .axisOffset(20.dp)
-        .labelData { index -> (index * (100 / stepSize)).toString() }
+        .labelData { index -> (index).toString() }
         .backgroundColor(NewPink)
         .build()
 

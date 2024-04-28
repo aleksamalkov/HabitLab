@@ -12,9 +12,10 @@ import java.time.YearMonth
 
 class StatisticsViewModel (private val dataRepository: DataRepository, val habit: Habit) : ViewModel() {
     val today: LocalDate = LocalDate.now()
-    var month: YearMonth = YearMonth.now()
+    var month: YearMonth = YearMonth.of(today.year, today.month)
     val doneDates = mutableStateListOf<LocalDate>()
     val pieRatio = mutableFloatStateOf(0.0F)
+    val barData = mutableStateListOf<Int>()
 
     init {
         viewModelScope.launch {
@@ -30,7 +31,11 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
 
     private suspend fun refresh() {
         refreshDates()
-        refreshPie()
+        if (habit.isNumeric) {
+            refreshBarChart()
+        } else {
+            refreshPieChart()
+        }
     }
 
     private suspend fun refreshDates() {
@@ -43,7 +48,13 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
         doneDates.addAll(newDates)
     }
 
-    private suspend fun refreshPie() {
+    private suspend fun refreshPieChart() {
         pieRatio.floatValue = dataRepository.getDoneRatio(habit, today)
+    }
+
+    private suspend fun refreshBarChart() {
+        val newBarData = dataRepository.getNumericExecutions(habit, month.atDay(1), month.atEndOfMonth())
+        barData.clear()
+        barData.addAll(newBarData)
     }
 }
