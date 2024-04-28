@@ -2,6 +2,7 @@ package rs.ac.bg.matf.habitlab
 
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -17,6 +18,9 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     val pieRatio = mutableFloatStateOf(0.0F)
     val barData = mutableStateListOf<Int>()
 
+    var startDate = mutableStateOf(today.minusDays(6))
+    var endDate = mutableStateOf(today)
+
     init {
         viewModelScope.launch {
             refresh()
@@ -31,11 +35,7 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
 
     private suspend fun refresh() {
         refreshDates()
-        if (habit.isNumeric) {
-            refreshBarChart()
-        } else {
-            refreshPieChart()
-        }
+        refreshCharts()
     }
 
     private suspend fun refreshDates() {
@@ -48,12 +48,26 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
         doneDates.addAll(newDates)
     }
 
+    fun refreshChartsSynchronously() {
+        viewModelScope.launch {
+            refreshCharts()
+        }
+    }
+
+    private suspend fun refreshCharts() {
+        if (habit.isNumeric) {
+            refreshBarChart()
+        } else {
+            refreshPieChart()
+        }
+    }
+
     private suspend fun refreshPieChart() {
-        pieRatio.floatValue = dataRepository.getDoneRatio(habit, today)
+        pieRatio.floatValue = dataRepository.getDoneRatio(habit, startDate.value, endDate.value)
     }
 
     private suspend fun refreshBarChart() {
-        val newBarData = dataRepository.getNumericExecutions(habit, month.atDay(1), month.atEndOfMonth())
+        val newBarData = dataRepository.getNumericExecutions(habit, startDate.value, endDate.value)
         barData.clear()
         barData.addAll(newBarData)
     }

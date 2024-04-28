@@ -19,17 +19,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,9 +61,10 @@ import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import rs.ac.bg.matf.habitlab.ui.theme.NewPink
-import rs.ac.bg.matf.habitlab.ui.theme.Pink40
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 class StatisticsActivity : ComponentActivity() {
     private lateinit var db: AppDatabase
@@ -180,6 +186,77 @@ fun ShowCalendar(selectedDate: SnapshotStateList<LocalDate>) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerButton(viewModel: StatisticsViewModel) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    val dateState = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input)
+
+    Row {
+        Button(
+            onClick = {
+                showDatePicker = true
+            },
+        ) {
+            Text(text = "Set date range")
+        }
+    }
+
+    fun select() {
+        if (dateState.selectedStartDateMillis != null && dateState.selectedEndDateMillis != null) {
+            val selectedStartDate = Calendar.getInstance().apply {
+                timeInMillis = dateState.selectedStartDateMillis!!
+            }
+            val selectedEndDate = Calendar.getInstance().apply {
+                timeInMillis = dateState.selectedEndDateMillis!!
+            }
+            // from https://stackoverflow.com/questions/48983572/convert-calendar-to-localdate
+            viewModel.startDate.value = LocalDateTime.ofInstant(
+                selectedStartDate.toInstant(),
+                selectedStartDate.timeZone.toZoneId()
+            ).toLocalDate()
+            viewModel.endDate.value = LocalDateTime.ofInstant(
+                selectedEndDate.toInstant(),
+                selectedEndDate.timeZone.toZoneId()
+            ).toLocalDate()
+            viewModel.refreshChartsSynchronously()
+        }
+    }
+
+    // date picker component
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = {
+                select()
+                showDatePicker = false
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        select()
+                        showDatePicker = false
+                    },
+                ) {
+                    Text(text = "OK")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        select()
+                        showDatePicker = false
+                    },
+                ) {
+                    Text(text = "Cancel")
+                }
+            },
+        )
+        {
+            DateRangePicker(state = dateState)
+        }
+    }
+}
+
 @Composable
 fun ShowPie(viewModel: StatisticsViewModel) {
     val showDialog = remember { mutableStateOf(false) }
@@ -188,27 +265,9 @@ fun ShowPie(viewModel: StatisticsViewModel) {
         //TODO da se napravi funkcikonalnost ovom textfieldu
         Row {
             Spacer(modifier = Modifier.width(20.dp))
-            TextField(
-                value = "",
-                onValueChange = { },
-                placeholder = {
-                    Text(
-                        text = "poslednjih x dana",
-                        fontSize = 20.sp
-                    )
-                },
-                modifier = Modifier
-                    //.background(Color.LightGray, shape = RoundedCornerShape(50.dp))
-                    .width(200.dp)
-            )
+            DatePickerButton(viewModel)
             Spacer(modifier = Modifier.width(20.dp))
-
-            Button(
-                onClick = { showDialog.value = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
-            ) {
-                Text("Prikazi pie")
-            }
+            Text(text = "${viewModel.startDate.value} - ${viewModel.endDate.value}")
         }
     }
     ShowPieChart(viewModel)
@@ -263,27 +322,9 @@ fun ShowBar(viewModel: StatisticsViewModel) {
         //TODO da se napravi funkcikonalnost ovom textfieldu
         Row {
             Spacer(modifier = Modifier.width(20.dp))
-            TextField(
-                value = "",
-                onValueChange = { },
-                placeholder = {
-                    Text(
-                        text = "poslednjih x dana",
-                        fontSize = 20.sp
-                    )
-                },
-                modifier = Modifier
-                    .width(200.dp)
-            )
+            DatePickerButton(viewModel)
             Spacer(modifier = Modifier.width(20.dp))
-            Button(
-                onClick = { showDialog.value = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
-            ) {
-                Text("Prikazi bar")
-                  //  color = MaterialTheme.colorScheme.tertiary)
-            }
-
+            Text(text = "${viewModel.startDate.value} - ${viewModel.endDate.value}")
         }
         ShowBarChart(viewModel)
         if (showDialog.value) {
@@ -341,6 +382,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
         backgroundColor = NewPink
     )
 
-    BarChart(modifier = Modifier.height(350.dp)
+    BarChart(modifier = Modifier
+        .height(350.dp)
         .fillMaxWidth(), barChartData = barChartData)
 }

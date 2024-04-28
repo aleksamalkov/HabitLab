@@ -25,15 +25,15 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
     - [x] UI
     - [x] data
     - [ ] smisliti sta cemo sa cancel i ok i sta treba da se desi kad klikcemo polja
-- [ ] pie chart
+- [x] pie chart
     - [x] UI
     - [x] data
-    - [ ] biranje perioda
+    - [x] biranje perioda
 - [ ] bar chart
     - [x] UI
     - [x] data
     - [ ] skaliranje y ose za velike brojeve
-    - [ ] biranje perioda
+    - [x] biranje perioda
 - [ ] streak (trenutni i/ili najbolji) (mozda nam i ne treba?)
 - [x] dugme za vracanje na MainActivity (pozivom funkcije finish())
 - [ ] dugme za brisanje navike
