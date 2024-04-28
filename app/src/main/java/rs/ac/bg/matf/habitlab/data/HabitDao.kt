@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface HabitDao {
@@ -14,5 +15,18 @@ interface HabitDao {
     suspend fun insert(habit: Habit)
 
     @Delete
-    suspend fun delete(habit: Habit)
+    abstract fun deleteHabit(habit: Habit)
+
+    @Query(
+        "DELETE " +
+        "FROM occurrence " +
+        "WHERE habitId = :id "
+    )
+    abstract fun deleteOccurrences(id: Int)
+
+    @Transaction
+    suspend fun delete(habit: Habit) {
+        deleteOccurrences(habit.id)
+        deleteHabit(habit)
+    }
 }

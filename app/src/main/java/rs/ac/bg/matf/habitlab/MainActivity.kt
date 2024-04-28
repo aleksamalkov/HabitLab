@@ -126,6 +126,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        stateHolder.refreshView()
+    }
 }
 
 @Composable

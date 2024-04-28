@@ -93,253 +93,249 @@ class StatisticsActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                     ){
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        item {
-                            Box(modifier = Modifier.height(60.dp))
-                            {
-                                Row {
-                                    ReturnButton()
-                                    Text(
-                                        text = viewModel.habit.name,
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 50.sp,
-                                        modifier = Modifier
-                                            .weight(1f) // This will make the Text take up all the available horizontal space
-                                            .padding(horizontal = 8.dp)
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            item {
+                                Box(modifier = Modifier.height(60.dp))
+                                {
+                                    Row {
+                                        ReturnButton()
+                                        Text(
+                                            text = viewModel.habit.name,
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 50.sp,
+                                            modifier = Modifier
+                                                .weight(1f) // This will make the Text take up all the available horizontal space
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                        RemoveButton(viewModel)
+                                    }
+                                }
+                            }
+                            item {
+                                Box(modifier = Modifier.height(400.dp)) {
+                                    ShowCalendar(
+                                        selectedDate = viewModel.doneDates
                                     )
-                                    RemoveButton()
                                 }
                             }
-                        }
-                                    item {
-                                        Box(modifier = Modifier.height(400.dp)) {
-                                            ShowCalendar(
-                                                selectedDate = viewModel.doneDates
-                                            )
-                                        }
-                                    }
-                                    if (viewModel.habit.isNumeric) {
-                                        item { ShowBar() }
-                                    } else {
-                                        item { ShowPie(viewModel) }
+                            if (viewModel.habit.isNumeric) {
+                                item { ShowBar() }
+                            } else {
+                                item { ShowPie(viewModel) }
 
-                                    }
-                                    }
-
-                                }
                             }
-
                         }
                     }
-
                 }
             }
+        }
+    }
+}
 
-                @Composable
-                fun ReturnButton() {
-                    val activity = (LocalContext.current as? Activity)
-                    IconButton(
-                        onClick = { activity?.finish() },
-                        modifier = Modifier.size(60.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Unazad",
-                            modifier = Modifier.size(50.dp)
-                        )
-                    }
-                }
+@Composable
+fun ReturnButton() {
+    val activity = (LocalContext.current as? Activity)
+    IconButton(
+        onClick = { activity?.finish() },
+        modifier = Modifier.size(60.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Unazad",
+            modifier = Modifier.size(50.dp)
+        )
+    }
+}
 
+@Composable
+fun RemoveButton(viewModel: StatisticsViewModel) {
+    val activity = (LocalContext.current as? Activity)
+    IconButton(
+        onClick = {
+            viewModel.delete()
+            activity?.finish()
+        },
+        modifier = Modifier
+        //  .size(100.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = "Obrisi",
+            modifier = Modifier
+                .size(80.dp)
+        )
+    }
+}
 
-                // TODO treba zapravo implementirati
-                @Composable
-                fun RemoveButton() {
-                    val activity = (LocalContext.current as? Activity)
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                        //  .size(100.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Obrisi",
-                            modifier = Modifier
-                                .size(80.dp)
-                        )
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowCalendar(selectedDate: SnapshotStateList<LocalDate>) {
+    var mutableSelectedDates = selectedDate
+    CalendarView(
+        useCaseState = rememberUseCaseState(true),
+        config = CalendarConfig(
+            yearSelection = true,
+            monthSelection = true,
+            style = CalendarStyle.MONTH,
+        ),
+        selection = CalendarSelection.Dates(
+            selectedDates = mutableSelectedDates.toList()
+        ) { newDate ->
+            mutableSelectedDates = newDate as SnapshotStateList<LocalDate>
+        },
+    )
+}
 
-                    }
-                }
+@Composable
+fun ShowPie(viewModel: StatisticsViewModel) {
+    val showDialog = remember { mutableStateOf(false) }
 
-                @OptIn(ExperimentalMaterial3Api::class)
-                @Composable
-                fun ShowCalendar(selectedDate: SnapshotStateList<LocalDate>) {
-                    var mutableSelectedDates = selectedDate
-                    CalendarView(
-                        useCaseState = rememberUseCaseState(true),
-                        config = CalendarConfig(
-                            yearSelection = true,
-                            monthSelection = true,
-                            style = CalendarStyle.MONTH,
-                        ),
-                        selection = CalendarSelection.Dates(
-                            selectedDates = mutableSelectedDates.toList()
-                        ) { newDate ->
-                            mutableSelectedDates = newDate as SnapshotStateList<LocalDate>
-                        },
+    Column {
+        //TODO da se napravi funkcikonalnost ovom textfieldu
+        Row() {
+            Spacer(modifier = Modifier.width(20.dp))
+            TextField(
+                value = "",
+                onValueChange = { },
+                placeholder = {
+                    Text(
+                        text = "poslednjih x dana",
+                        fontSize = 20.sp
                     )
-                }
+                },
+                modifier = Modifier
+                    //.background(Color.LightGray, shape = RoundedCornerShape(50.dp))
+                    .width(200.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
 
-                @Composable
-                fun ShowPie(viewModel: StatisticsViewModel) {
-                    val showDialog = remember { mutableStateOf(false) }
+            Button(
+                onClick = { showDialog.value = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+            ) {
+                Text("Prikazi pie")
+            }
+        }
+    }
+    ShowPieChart(viewModel)
+    if (showDialog.value) {
+        ShowPieChart(viewModel)
+    }
+}
 
-                    Column {
-                        //TODO da se napravi funkcikonalnost ovom textfieldu
-                        Row() {
-                            Spacer(modifier = Modifier.width(20.dp))
-                            TextField(
-                                value = "",
-                                onValueChange = { },
-                                placeholder = {
-                                    Text(
-                                        text = "poslednjih x dana",
-                                        fontSize = 20.sp
-                                    )
-                                },
-                                modifier = Modifier
-                                    //.background(Color.LightGray, shape = RoundedCornerShape(50.dp))
-                                    .width(200.dp)
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
+@Composable
+fun ShowPieChart(viewModel: StatisticsViewModel) {
+    val pieChartData = PieChartData(
+        slices = listOf(
+            PieChartData.Slice(
+                "Uradjeno",
+                viewModel.pieRatio.floatValue * 100,
+                Color(0xFF333333)
+            ),
+            PieChartData.Slice(
+                "Nije",
+                (1 - viewModel.pieRatio.floatValue) * 100,
+                Color(0xFF666a86)
+            )
 
-                            Button(
-                                onClick = { showDialog.value = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
-                            ) {
-                                Text("Prikazi pie")
-                            }
-                        }
-                    }
-                    ShowPieChart(viewModel)
-                    if (showDialog.value) {
-                        ShowPieChart(viewModel)
-                    }
-                }
+        ),
+        plotType = PlotType.Pie
+    )
+    val pieChartConfig = PieChartConfig(
 
-                // TODO da se napravi da prima listu kad je uradjeno i na osnovu nje napravi pie chart
-                @Composable
-                fun ShowPieChart(viewModel: StatisticsViewModel) {
-                    val pieChartData = PieChartData(
-                        slices = listOf(
-                            PieChartData.Slice(
-                                "Uradjeno",
-                                viewModel.pieRatio.floatValue * 100,
-                                Color(0xFF333333)
-                            ),
-                            PieChartData.Slice(
-                                "Nije",
-                                (1 - viewModel.pieRatio.floatValue) * 100,
-                                Color(0xFF666a86)
-                            )
+        labelVisible = true,
+        sliceLabelTextSize = 10.sp,
+        isAnimationEnable = true,
+        showSliceLabels = true,
+        animationDuration = 1500,
+        backgroundColor = NewPink
+    )
 
-                        ),
-                        plotType = PlotType.Pie
+    PieChart(
+        modifier = Modifier
+            .width(250.dp)
+            .height(250.dp),
+
+        pieChartData,
+        pieChartConfig
+    )
+}
+
+@Composable
+fun ShowBar() {
+    val showDialog = remember { mutableStateOf(false) }
+
+    Column {
+        //TODO da se napravi funkcikonalnost ovom textfieldu
+        Row {
+            Spacer(modifier = Modifier.width(20.dp))
+            TextField(
+                value = "",
+                onValueChange = { },
+                placeholder = {
+                    Text(
+                        text = "poslednjih x dana",
+                        fontSize = 20.sp
                     )
-                    val pieChartConfig = PieChartConfig(
+                },
+                modifier = Modifier
+                    .width(200.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Button(
+                onClick = { showDialog.value = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
+            ) {
+                Text("Prikazi bar")
+                  //  color = MaterialTheme.colorScheme.tertiary)
+            }
 
-                        labelVisible = true,
-                        sliceLabelTextSize = 10.sp,
-                        isAnimationEnable = true,
-                        showSliceLabels = true,
-                        animationDuration = 1500,
-                        backgroundColor = NewPink
-                    )
+        }
+        ShowBarChart()
+        if (showDialog.value) {
+            ShowBarChart()
+        }
+    }
+}
 
-                    PieChart(
-                        modifier = Modifier
-                            .width(250.dp)
-                            .height(250.dp),
+@Composable
+fun ShowBarChart(){
+    val stepSize = 5
+    val barsData = DataUtils.getBarChartData(
+        listSize = 8,
+        maxRange = 8,
+        barChartType = BarChartType.VERTICAL,
+        dataCategoryOptions = DataCategoryOptions()
+    )
 
-                        pieChartData,
-                        pieChartConfig
-                    )
-                }
+    val xAxisData = AxisData.Builder()
+        .axisStepSize(30.dp)
+        .steps(barsData.size - 1)
+        .bottomPadding(40.dp)
+        .axisLabelAngle(20f)
+        .labelData { index -> barsData[index].label }
+        .backgroundColor(NewPink)
+        .build()
 
+    val yAxisData = AxisData.Builder()
+        .steps(stepSize)
+        .labelAndAxisLinePadding(20.dp)
+        .axisOffset(20.dp)
+        .labelData { index -> (index * (100 / stepSize)).toString() }
+        .backgroundColor(NewPink)
+        .build()
 
-                @Composable
-                fun ShowBar() {
-                    val showDialog = remember { mutableStateOf(false) }
+    val barChartData = BarChartData(
+        chartData = barsData,
+        xAxisData = xAxisData,
+        yAxisData = yAxisData,
+        paddingEnd = 0.dp,
+        backgroundColor = NewPink
+    )
 
-                    Column {
-                        //TODO da se napravi funkcikonalnost ovom textfieldu
-                        Row {
-                            Spacer(modifier = Modifier.width(20.dp))
-                            TextField(
-                                value = "",
-                                onValueChange = { },
-                                placeholder = {
-                                    Text(
-                                        text = "poslednjih x dana",
-                                        fontSize = 20.sp
-                                    )
-                                },
-                                modifier = Modifier
-                                    .width(200.dp)
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Button(
-                                onClick = { showDialog.value = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = Pink40)
-                            ) {
-                                Text("Prikazi bar")
-                                  //  color = MaterialTheme.colorScheme.tertiary)
-                            }
-
-                        }
-                        ShowBarChart()
-                        if (showDialog.value) {
-                            ShowBarChart()
-                        }
-                    }
-                }
-                @Composable
-                fun ShowBarChart(){
-                    val stepSize = 5
-                    val barsData = DataUtils.getBarChartData(
-                        listSize = 8,
-                        maxRange = 8,
-                        barChartType = BarChartType.VERTICAL,
-                        dataCategoryOptions = DataCategoryOptions()
-                    )
-
-                    val xAxisData = AxisData.Builder()
-                        .axisStepSize(30.dp)
-                        .steps(barsData.size - 1)
-                        .bottomPadding(40.dp)
-                        .axisLabelAngle(20f)
-                        .labelData { index -> barsData[index].label }
-                        .backgroundColor(NewPink)
-                        .build()
-
-                    val yAxisData = AxisData.Builder()
-                        .steps(stepSize)
-                        .labelAndAxisLinePadding(20.dp)
-                        .axisOffset(20.dp)
-                        .labelData { index -> (index * (100 / stepSize)).toString() }
-                        .backgroundColor(NewPink)
-                        .build()
-
-                    val barChartData = BarChartData(
-                        chartData = barsData,
-                        xAxisData = xAxisData,
-                        yAxisData = yAxisData,
-                        paddingEnd = 0.dp,
-                        backgroundColor = NewPink
-                    )
-
-                    BarChart(modifier = Modifier.height(350.dp)
-                        .fillMaxWidth(), barChartData = barChartData)
-                }
+    BarChart(modifier = Modifier.height(350.dp)
+        .fillMaxWidth(), barChartData = barChartData)
+}

@@ -29,9 +29,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     val today: LocalDate = LocalDate.now()
 
     init {
-        viewModelScope.launch {
-            refresh()
-        }
+        refreshView()
     }
 
     // dodavanje navike u bazu i osvezavanje interfejsa
@@ -74,6 +72,12 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
                 dataRepository.updateNumeric(habit, date, value.toInt())
             }
             refreshNumeric(habit)
+        }
+    }
+
+    fun refreshView() {
+        viewModelScope.launch {
+            refresh()
         }
     }
 

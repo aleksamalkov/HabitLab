@@ -22,6 +22,12 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
         }
     }
 
+    fun delete() {
+        viewModelScope.launch {
+            dataRepository.removeHabit(habit)
+        }
+    }
+
     private suspend fun refresh() {
         refreshDates()
         refreshPie()
