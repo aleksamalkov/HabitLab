@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,7 +59,6 @@ import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
-import rs.ac.bg.matf.habitlab.ui.theme.NewPink
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -84,7 +82,7 @@ class StatisticsActivity : ComponentActivity() {
             HabitLabTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    color = NewPink
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     Box(
                         modifier = Modifier
@@ -283,12 +281,12 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
             PieChartData.Slice(
                 "Uradjeno",
                 viewModel.pieRatio.floatValue * 100,
-                Color(0xFF333333)
+                color = MaterialTheme.colorScheme.primary
             ),
             PieChartData.Slice(
                 "Nije",
                 (1 - viewModel.pieRatio.floatValue) * 100,
-                Color(0xFF666a86)
+                color = MaterialTheme.colorScheme.secondary,
             )
 
         ),
@@ -301,7 +299,7 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
         isAnimationEnable = true,
         showSliceLabels = true,
         animationDuration = 1500,
-        backgroundColor = NewPink
+        backgroundColor = MaterialTheme.colorScheme.background,
     )
 
     PieChart(
@@ -348,7 +346,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
     for (i in data) {
         barsData.add(BarData(
             Point(x, i.toFloat()),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.primary,
             label = date.format(formatter),
         ))
         x += 1f
@@ -361,7 +359,9 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
         .bottomPadding(40.dp)
         .axisLabelAngle(20f)
         .labelData { index -> barsData[index].label }
-        .backgroundColor(NewPink)
+        .backgroundColor(MaterialTheme.colorScheme.background)
+        .axisLabelColor(MaterialTheme.colorScheme.onBackground)
+        .axisLineColor(MaterialTheme.colorScheme.onBackground)
         .build()
 
     // TODO popraviti za veliko max
@@ -371,7 +371,9 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
         .labelAndAxisLinePadding(20.dp)
         .axisOffset(20.dp)
         .labelData { index -> (index).toString() }
-        .backgroundColor(NewPink)
+        .backgroundColor(MaterialTheme.colorScheme.background)
+        .axisLabelColor(MaterialTheme.colorScheme.onBackground)
+        .axisLineColor(MaterialTheme.colorScheme.onBackground)
         .build()
 
     val barChartData = BarChartData(
@@ -379,7 +381,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
         xAxisData = xAxisData,
         yAxisData = yAxisData,
         paddingEnd = 0.dp,
-        backgroundColor = NewPink
+        backgroundColor = MaterialTheme.colorScheme.background,
     )
 
     BarChart(modifier = Modifier

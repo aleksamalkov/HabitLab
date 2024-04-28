@@ -169,7 +169,7 @@ fun BinaryTask(viewModel: StateHolder, habit: Habit) {
 fun AddTaskButton(isBinary: Boolean, onClick: () -> Unit) {
     Button(onClick = onClick,
         modifier = Modifier.width(120.dp),
-        colors = ButtonDefaults.buttonColors(Pink40)
+        colors = ButtonDefaults.buttonColors()
     ) {
         if (isBinary) {
             Text(text = "+ Binary")
@@ -233,7 +233,6 @@ fun StatisticsButton(habit: Habit){
     }) {
         Text(text = habit.name,
             style = TextStyle(fontSize = 20.sp),
-            color = androidx.compose.ui.graphics.Color.Black
         )
     }
 }

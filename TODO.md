@@ -12,7 +12,7 @@
 - [x] slanje habit objekta activity-u koji se pokrece
 - [ ] prikazivanje 0 (mozda i bolje ovako?)
 - [x] delovi koji ne treba da se skroluju
-- [ ] pozadina za red sa datumima
+- [x] red sa datumima ne treba da bude providan
 - [ ] aplikacija puca kada se text field za broj unese enter?
 
 ## StatisticsActivity
@@ -46,7 +46,7 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 
 ## Ostalo
 - [x] popraviti pozadinu kad je ukljucena tamna tema
-- [ ] materialTheme cudno ponasanje
+- [x] materialTheme cudno ponasanje
 - [ ] napisati README.md
 - [ ] prebaciti repo na public
     - [ ] preimenovati repozitorijum
