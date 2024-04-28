@@ -7,10 +7,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
-import rs.ac.bg.matf.habitlab.data.HabitDao
-import rs.ac.bg.matf.habitlab.data.Occurrence
 import java.time.LocalDate
 
 
@@ -22,11 +22,13 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // stanje textfieldova za numericke taskove
     val numbersState = mutableStateMapOf<Habit, SnapshotStateList<Int>>()
     // string koji upisujemo u polje
-    val textFieldString = mutableStateOf<String>("")
+    val textFieldString = mutableStateOf("")
     // string koji upisujemo u polje za goal
-    val goalString = mutableStateOf<String>("")
+    val goalString = mutableStateOf("")
     // danasnji dan
     val today: LocalDate = LocalDate.now()
+
+    private val mutex = Mutex()
 
     init {
         refreshView()
@@ -92,8 +94,10 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
             else
                 refreshBinary(habit)
         }
-        habits.clear()
-        habits.addAll(newHabits)
+        mutex.withLock {
+            habits.clear()
+            habits.addAll(newHabits)
+        }
     }
 
     // osvezavanje interfejsa kada se uradi neki binarni zadatak za binarnu naviku 'habit'

@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import java.time.LocalDate
@@ -17,9 +19,9 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     val doneDates = mutableStateListOf<LocalDate>()
     val pieRatio = mutableFloatStateOf(0.0F)
     val barData = mutableStateListOf<Int>()
-
     var startDate = mutableStateOf(today.minusDays(6))
     var endDate = mutableStateOf(today)
+    private val mutex = Mutex()
 
     init {
         viewModelScope.launch {
@@ -44,8 +46,11 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
             month.atDay(1),
             month.atEndOfMonth(),
         )
-        doneDates.clear()
-        doneDates.addAll(newDates)
+
+        mutex.withLock {
+            doneDates.clear()
+            doneDates.addAll(newDates)
+        }
     }
 
     fun refreshChartsSynchronously() {
@@ -68,7 +73,9 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
 
     private suspend fun refreshBarChart() {
         val newBarData = dataRepository.getNumericExecutions(habit, startDate.value, endDate.value)
-        barData.clear()
-        barData.addAll(newBarData)
+        mutex.withLock {
+            barData.clear()
+            barData.addAll(newBarData)
+        }
     }
 }
