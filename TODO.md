@@ -21,10 +21,9 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 - [x] napraviti klasu koja nasledjuje ViewModel u kojoj ce se cuvati stanje
 - [x] naziv navike
 - [ ] cilj za numercike navike
-- [ ] kalendar
+- [x] kalendar
     - [x] UI
     - [x] data
-    - [ ] smisliti sta cemo sa cancel i ok i sta treba da se desi kad klikcemo polja
 - [x] pie chart
     - [x] UI
     - [x] data

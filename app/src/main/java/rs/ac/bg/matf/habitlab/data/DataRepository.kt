@@ -58,8 +58,16 @@ class DataRepository (private val habitDao: HabitDao, private val occurrenceDao:
         return result
     }
 
-    suspend fun getDoneDates(habit: Habit, from: LocalDate, until: LocalDate): List<LocalDate> {
-        return occurrenceDao.getForHabit(habit.id, from, until).map {occurrence -> occurrence.date }
+    suspend fun getScorePerDate(habit: Habit, from: LocalDate, until: LocalDate): List<Pair<LocalDate, Int>> {
+        return occurrenceDao.getForHabit(habit.id, from, until).map { occurrence ->
+            Pair(
+                occurrence.date,
+                if (habit.isNumeric)
+                    occurrence.count ?: 0
+                else
+                    1
+            )
+        }
     }
 
     suspend fun getDoneRatio(habit: Habit, from: LocalDate, until: LocalDate): Float {
@@ -70,7 +78,7 @@ class DataRepository (private val habitDao: HabitDao, private val occurrenceDao:
     suspend fun getDoneRatio(habit: Habit, today: LocalDate): Float {
         val date = occurrenceDao.firstDate(habit.id)
         return if (date == null) {
-            0f;
+            0f
         } else {
             (occurrenceDao.countOccurrences(habit.id).toFloat()
                     / (Duration.between(date.atStartOfDay(), today.atStartOfDay()).toDays() + 1))

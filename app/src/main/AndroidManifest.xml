@@ -19,7 +19,7 @@
             android:label="@string/title_activity_statistics_number"
             android:theme="@style/Theme.HabitLab" />
         <activity
-            android:name=".StatisticsActivity"
+            android:name=".statisticsActivity.StatisticsActivity"
             android:exported="false"
             android:label="@string/title_activity_statistics"
             android:theme="@style/Theme.HabitLab" />

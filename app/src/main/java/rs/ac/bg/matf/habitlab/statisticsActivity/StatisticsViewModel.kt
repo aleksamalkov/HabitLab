@@ -1,7 +1,8 @@
-package rs.ac.bg.matf.habitlab
+package rs.ac.bg.matf.habitlab.statisticsActivity
 
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,16 +12,16 @@ import kotlinx.coroutines.sync.withLock
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import java.time.LocalDate
-import java.time.YearMonth
+import kotlin.math.max
 
 class StatisticsViewModel (private val dataRepository: DataRepository, val habit: Habit) : ViewModel() {
     val today: LocalDate = LocalDate.now()
-    var month: YearMonth = YearMonth.of(today.year, today.month)
-    val doneDates = mutableStateListOf<LocalDate>()
     val pieRatio = mutableFloatStateOf(0.0F)
     val barData = mutableStateListOf<Int>()
     var startDate = mutableStateOf(today.minusDays(6))
     var endDate = mutableStateOf(today)
+    val calendarData = mutableStateMapOf<LocalDate, HeatLevel>()
+
     private val mutex = Mutex()
 
     init {
@@ -41,19 +42,38 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     }
 
     private suspend fun refreshDates() {
-        val newDates = dataRepository.getDoneDates(
+        val newDates = dataRepository.getScorePerDate(
             habit,
-            month.atDay(1),
-            month.atEndOfMonth(),
+            today.minusYears(1),
+            today
         )
 
+        val maxValue = newDates.maxOf { it.second }
+        val step = max(maxValue / 4, 1)
+
         mutex.withLock {
-            doneDates.clear()
-            doneDates.addAll(newDates)
+            calendarData.clear()
+            if (habit.isNumeric) {
+                for (pair in newDates) {
+                    val category = (step + pair.second - 1) / step
+                    calendarData[pair.first] = when (category) {
+                        0 -> HeatLevel.Zero
+                        1 -> HeatLevel.One
+                        2 -> HeatLevel.Two
+                        3 -> HeatLevel.Three
+                        else -> HeatLevel.Four
+                    }
+                }
+            }
+            else {
+                for (pair in newDates) {
+                    calendarData[pair.first] = if (pair.second == 1) HeatLevel.Four else HeatLevel.Zero
+                }
+            }
         }
     }
 
-    fun refreshChartsSynchronously() {
+    fun launchRefreshCharts() {
         viewModelScope.launch {
             refreshCharts()
         }

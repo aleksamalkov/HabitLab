@@ -34,24 +34,15 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.content.Intent
-import android.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
-import rs.ac.bg.matf.habitlab.ui.theme.NewPink
-import rs.ac.bg.matf.habitlab.ui.theme.Pink40
+import rs.ac.bg.matf.habitlab.statisticsActivity.StatisticsActivity
 
 
 class MainActivity : ComponentActivity() {

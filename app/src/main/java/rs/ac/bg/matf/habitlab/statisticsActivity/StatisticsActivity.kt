@@ -1,11 +1,13 @@
-package rs.ac.bg.matf.habitlab
+package rs.ac.bg.matf.habitlab.statisticsActivity
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -50,16 +51,14 @@ import co.yml.charts.ui.barchart.models.BarData
 import co.yml.charts.ui.piechart.charts.PieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
-import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
-import com.maxkeppeler.sheets.calendar.CalendarView
-import com.maxkeppeler.sheets.calendar.models.CalendarConfig
-import com.maxkeppeler.sheets.calendar.models.CalendarSelection
-import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import com.kizitonwose.calendar.compose.HeatMapCalendar
+import com.kizitonwose.calendar.compose.heatmapcalendar.rememberHeatMapCalendarState
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.kizitonwose.calendar.core.yearMonth
 import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -110,11 +109,7 @@ class StatisticsActivity : ComponentActivity() {
                                 }
                             }
                             item {
-                                Box(modifier = Modifier.height(400.dp)) {
-                                    ShowCalendar(
-                                        selectedDate = viewModel.doneDates
-                                    )
-                                }
+                                ShowCalendar(viewModel)
                             }
                             if (viewModel.habit.isNumeric) {
                                 item { ShowBar(viewModel) }
@@ -165,23 +160,44 @@ fun RemoveButton(viewModel: StatisticsViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowCalendar(selectedDate: SnapshotStateList<LocalDate>) {
-    var mutableSelectedDates = selectedDate
-    CalendarView(
-        useCaseState = rememberUseCaseState(true),
-        config = CalendarConfig(
-            yearSelection = true,
-            monthSelection = true,
-            style = CalendarStyle.MONTH,
-        ),
-        selection = CalendarSelection.Dates(
-            selectedDates = mutableSelectedDates.toList()
-        ) { newDate ->
-            mutableSelectedDates = newDate as SnapshotStateList<LocalDate>
-        },
-    )
+fun ShowCalendar(viewModel: StatisticsViewModel) {
+    val endDate = viewModel.today
+    val startDate = endDate.minusMonths(12)
+    val data = viewModel.calendarData
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        val state = rememberHeatMapCalendarState(
+            startMonth = startDate.yearMonth,
+            endMonth = endDate.yearMonth,
+            firstVisibleMonth = endDate.yearMonth,
+            firstDayOfWeek = firstDayOfWeekFromLocale(),
+        )
+        HeatMapCalendar(
+            modifier = Modifier.padding(vertical = 10.dp),
+            state = state,
+            contentPadding = PaddingValues(end = 6.dp),
+            dayContent = { day, week ->
+                Day(
+                    day = day,
+                    startDate = startDate,
+                    endDate = endDate,
+                    week = week,
+                    level = data[day.date] ?: HeatLevel.Zero,
+                )
+            },
+            weekHeader = { WeekHeader(it) },
+            monthHeader = { MonthHeader(it, endDate) },
+        )
+        CalendarInfo(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 44.dp),
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -217,7 +233,7 @@ fun DatePickerButton(viewModel: StatisticsViewModel) {
                 selectedEndDate.toInstant(),
                 selectedEndDate.timeZone.toZoneId()
             ).toLocalDate()
-            viewModel.refreshChartsSynchronously()
+            viewModel.launchRefreshCharts()
         }
     }
 
@@ -340,7 +356,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
 
     val barsData = mutableListOf<BarData>()
 
-    var date = viewModel.month.atDay(1)
+    var date = viewModel.startDate.value
     var x = 0f
     val formatter = DateTimeFormatter.ofPattern("MM-dd")
     for (i in data) {
