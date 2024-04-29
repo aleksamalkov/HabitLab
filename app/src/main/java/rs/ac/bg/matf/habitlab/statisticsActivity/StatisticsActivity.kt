@@ -61,6 +61,7 @@ import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
@@ -235,7 +236,13 @@ fun ShowCalendar(viewModel: StatisticsViewModel) {
 @Composable
 fun DatePickerButton(viewModel: StatisticsViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
-    val dateState = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input)
+    val dateState = rememberDateRangePickerState(
+        initialDisplayMode = DisplayMode.Input,
+        initialSelectedStartDateMillis = viewModel.startDate.value.atStartOfDay()
+            .toInstant(ZoneOffset.UTC).toEpochMilli(),
+        initialSelectedEndDateMillis = viewModel.endDate.value.atStartOfDay()
+            .toInstant(ZoneOffset.UTC).toEpochMilli(),
+    )
 
     Button(
         onClick = {
