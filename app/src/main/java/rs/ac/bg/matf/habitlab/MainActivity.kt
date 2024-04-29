@@ -92,7 +92,13 @@ class MainActivity : ComponentActivity() {
                                     label = { Text("Name") })
 
                                 TextField(value = stateHolder.goalString.value,
-                                    onValueChange = { stateHolder.goalString.value = it },
+                                    onValueChange = {
+                                        val pattern = Regex("[0-9]+")
+                                        if (it.matches(pattern)) {
+                                            stateHolder.goalString.value = it
+                                        } else{
+                                            stateHolder.goalString.value = ""
+                                        }},
                                     modifier = Modifier
                                         .width(80.dp)
                                         .height(50.dp),

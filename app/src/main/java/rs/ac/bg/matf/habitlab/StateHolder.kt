@@ -38,7 +38,8 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     fun addHabit(isNumeric: Boolean) {
         val taskName = textFieldString.value
         var goal = 0
-        if (isNumeric && goalString.value != "")
+        val pattern = Regex("[0-9]+")
+        if (isNumeric && goalString.value.trim().matches(pattern))
             goal = goalString.value.trim().toInt()
         if (taskName.isNotBlank()) {
             textFieldString.value = ""
@@ -66,8 +67,9 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
 
     fun onValueChange(habit: Habit, i: Int, value: String){
         val date = today.minusDays((6 - i).toLong())
+        val pattern = Regex("[0-9]+\\s*")
         viewModelScope.launch {
-            if(value == ""){
+            if(value == "" || !value.matches(pattern)){
                 dataRepository.updateNumeric(habit, date, 0)
             }
             else{
