@@ -48,7 +48,7 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
             today
         )
 
-        val maxValue = newDates.maxOf { it.second }
+        val maxValue = newDates.maxOfOrNull { it.second } ?: 0
         val step = max(maxValue / 4, 1)
 
         mutex.withLock {
