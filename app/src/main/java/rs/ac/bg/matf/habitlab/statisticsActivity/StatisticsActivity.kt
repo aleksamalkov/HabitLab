@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
@@ -28,9 +28,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.yml.charts.axis.AxisData
@@ -67,6 +68,7 @@ class StatisticsActivity : ComponentActivity() {
     private lateinit var db: AppDatabase
     private lateinit var viewModel: StatisticsViewModel
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -83,31 +85,21 @@ class StatisticsActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ){
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(text = viewModel.habit.name) },
+                                navigationIcon = { ReturnButton() },
+                                actions = { RemoveButton(viewModel) },
+                            )
+                        },
+                    ){ innerPadding ->
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(innerPadding)
+                                .padding(10.dp)
                         ) {
-                            item {
-                                Box(modifier = Modifier.height(60.dp))
-                                {
-                                    Row {
-                                        ReturnButton()
-                                        Text(
-                                            text = viewModel.habit.name,
-                                            textAlign = TextAlign.Center,
-                                            fontSize = 50.sp,
-                                            modifier = Modifier
-                                                .weight(1f) // This will make the Text take up all the available horizontal space
-                                                .padding(horizontal = 8.dp)
-                                        )
-                                        RemoveButton(viewModel)
-                                    }
-                                }
-                            }
                             item {
                                 ShowCalendar(viewModel)
                             }
@@ -135,9 +127,45 @@ fun ReturnButton() {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Unazad",
-            modifier = Modifier.size(50.dp)
         )
     }
+}
+
+@Composable
+fun DeleteDialog(viewModel: StatisticsViewModel, activity: Activity?) {
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Delete, contentDescription = "Delete Icon")
+        },
+        title = {
+            Text(text = "Delete habit")
+        },
+        text = {
+            Text(text = "Are you sure you want to delete habit ${viewModel.habit.name}?")
+        },
+        onDismissRequest = {
+            viewModel.showDeleteDialog.value = false
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    viewModel.delete()
+                    activity?.finish()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    viewModel.showDeleteDialog.value = false
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
 }
 
 @Composable
@@ -145,8 +173,7 @@ fun RemoveButton(viewModel: StatisticsViewModel) {
     val activity = (LocalContext.current as? Activity)
     IconButton(
         onClick = {
-            viewModel.delete()
-            activity?.finish()
+            viewModel.showDeleteDialog.value = true
         },
         modifier = Modifier
         //  .size(100.dp)
@@ -154,9 +181,11 @@ fun RemoveButton(viewModel: StatisticsViewModel) {
         Icon(
             imageVector = Icons.Default.Delete,
             contentDescription = "Obrisi",
-            modifier = Modifier
-                .size(80.dp)
         )
+    }
+
+    if (viewModel.showDeleteDialog.value) {
+        DeleteDialog(viewModel = viewModel, activity = activity)
     }
 }
 
@@ -192,11 +221,13 @@ fun ShowCalendar(viewModel: StatisticsViewModel) {
             weekHeader = { WeekHeader(it) },
             monthHeader = { MonthHeader(it, endDate) },
         )
-        CalendarInfo(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 44.dp),
-        )
+        if (viewModel.habit.isNumeric) {
+            CalendarInfo(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 44.dp),
+            )
+        }
     }
 }
 
@@ -206,14 +237,12 @@ fun DatePickerButton(viewModel: StatisticsViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
     val dateState = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input)
 
-    Row {
-        Button(
-            onClick = {
-                showDatePicker = true
-            },
-        ) {
-            Text(text = "Set date range")
-        }
+    Button(
+        onClick = {
+            showDatePicker = true
+        },
+    ) {
+        Text(text = "Pick range")
     }
 
     fun select() {
@@ -273,19 +302,12 @@ fun DatePickerButton(viewModel: StatisticsViewModel) {
 
 @Composable
 fun ShowPie(viewModel: StatisticsViewModel) {
-    val showDialog = remember { mutableStateOf(false) }
-
     Column {
-        //TODO da se napravi funkcikonalnost ovom textfieldu
         Row {
             Spacer(modifier = Modifier.width(20.dp))
             DatePickerButton(viewModel)
-            Spacer(modifier = Modifier.width(20.dp))
-            Text(text = "${viewModel.startDate.value} - ${viewModel.endDate.value}")
         }
-    }
-    ShowPieChart(viewModel)
-    if (showDialog.value) {
+        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         ShowPieChart(viewModel)
     }
 }
@@ -330,20 +352,14 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
 
 @Composable
 fun ShowBar(viewModel: StatisticsViewModel) {
-    val showDialog = remember { mutableStateOf(false) }
 
     Column {
-        //TODO da se napravi funkcikonalnost ovom textfieldu
         Row {
             Spacer(modifier = Modifier.width(20.dp))
             DatePickerButton(viewModel)
-            Spacer(modifier = Modifier.width(20.dp))
-            Text(text = "${viewModel.startDate.value} - ${viewModel.endDate.value}")
         }
+        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         ShowBarChart(viewModel)
-        if (showDialog.value) {
-            ShowBarChart(viewModel)
-        }
     }
 }
 

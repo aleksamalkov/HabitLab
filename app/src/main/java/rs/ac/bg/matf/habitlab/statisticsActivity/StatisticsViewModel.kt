@@ -18,9 +18,10 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     val today: LocalDate = LocalDate.now()
     val pieRatio = mutableFloatStateOf(0.0F)
     val barData = mutableStateListOf<Int>()
-    var startDate = mutableStateOf(today.minusDays(6))
-    var endDate = mutableStateOf(today)
+    val startDate = mutableStateOf(today.minusDays(6))
+    val endDate = mutableStateOf(today)
     val calendarData = mutableStateMapOf<LocalDate, HeatLevel>()
+    val showDeleteDialog = mutableStateOf(false)
 
     private val mutex = Mutex()
 
