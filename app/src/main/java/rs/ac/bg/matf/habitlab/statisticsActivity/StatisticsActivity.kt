@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,9 +44,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.yml.charts.axis.AxisData
+import co.yml.charts.common.components.Legends
+import co.yml.charts.common.model.LegendLabel
+import co.yml.charts.common.model.LegendsConfig
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.barchart.BarChart
@@ -66,6 +71,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+
 
 class StatisticsActivity : ComponentActivity() {
     private lateinit var db: AppDatabase
@@ -105,19 +111,26 @@ class StatisticsActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
-                            item{
-                           //     Text(text = "Daily goal: %d".format(viewModel.habit.goal.toString()))
-                            }
+
                             item {
                                 ShowCalendar(viewModel)
                             }
+
                             if (viewModel.habit.isNumeric) {
+                                item {
+                                    Text(
+                                        text = "Daily goal: ${viewModel.habit.goal}",
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Start
+                                    )
+                                }
                                 item { ShowBar(viewModel) }
                                 item { ShowNumPie(viewModel) }
                             } else {
                                 item { ShowPie(viewModel) }
 
                             }
+
                         }
                     }
                 }
@@ -256,6 +269,7 @@ fun DatePickerButton(viewModel: StatisticsViewModel) {
         onClick = {
             showDatePicker = true
         },
+       // modifier = Modifier.al
     ) {
         Text(text = "Pick range")
     }
@@ -335,12 +349,12 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
     val pieChartData = PieChartData(
         slices = listOf(
             PieChartData.Slice(
-                "Done",
+                "",
                 viewModel.pieRatio.floatValue * 100,
                 color = MaterialTheme.colorScheme.primary
             ),
             PieChartData.Slice(
-                "Not done",
+                "",
                 (1 - viewModel.pieRatio.floatValue) * 100,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -351,21 +365,39 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
     val pieChartConfig = PieChartConfig(
 
         labelVisible = true,
-        sliceLabelTextSize = 10.sp,
+        sliceLabelTextSize = 22.sp,
         isAnimationEnable = true,
         showSliceLabels = true,
         animationDuration = 1500,
         backgroundColor = MaterialTheme.colorScheme.background,
     )
+    Row {
+        PieChart(
+            modifier = Modifier
+                .width(250.dp)
+                .height(250.dp),
 
-    PieChart(
-        modifier = Modifier
-            .width(250.dp)
-            .height(250.dp),
-
-        pieChartData,
-        pieChartConfig
+            pieChartData,
+            pieChartConfig
+        )
+        Legends (
+            modifier = Modifier.height(100.dp),
+    legendsConfig = LegendsConfig(
+        legendLabelList = listOf(
+            LegendLabel(
+                color = MaterialTheme.colorScheme.primary,
+                name = "Done"
+            ),
+            LegendLabel(
+                color = MaterialTheme.colorScheme.secondary,
+                name = "Not done"
+            )
+        ),
+        legendsArrangement =  Arrangement.Start
     )
+    )
+
+}
 }
 
 @Composable
@@ -376,9 +408,11 @@ fun ShowNumPie(viewModel: StatisticsViewModel) {
 //        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         ShowNumPieChart(viewModel)
         //Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
-        Row{
+        Column(horizontalAlignment = Alignment.CenterHorizontally){
             Spacer(modifier = Modifier.width(20.dp))
-          //  DatePickerButton(viewModel)
+            Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+            Spacer(modifier = Modifier.width(20.dp))
+            DatePickerButton(viewModel)
         }
     }
 }
@@ -388,12 +422,12 @@ fun ShowNumPieChart(viewModel: StatisticsViewModel) {
     val pieChartData = PieChartData(
         slices = listOf(
             PieChartData.Slice(
-                "Goal",
+                "",
                 viewModel.goalRatio.floatValue * 100,
                 color = MaterialTheme.colorScheme.primary
             ),
             PieChartData.Slice(
-                "Not goal",
+                "",
                 (1 - viewModel.goalRatio.floatValue) * 100,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -404,21 +438,40 @@ fun ShowNumPieChart(viewModel: StatisticsViewModel) {
     val pieChartConfig = PieChartConfig(
 
         labelVisible = true,
-        sliceLabelTextSize = 10.sp,
+        sliceLabelTextSize = 22.sp,
         isAnimationEnable = true,
         showSliceLabels = true,
         animationDuration = 1500,
         backgroundColor = MaterialTheme.colorScheme.background,
     )
 
-    PieChart(
-        modifier = Modifier
-            .width(250.dp)
-            .height(250.dp),
+    Row {
+        PieChart(
+            modifier = Modifier
+                .width(250.dp)
+                .height(250.dp),
 
-        pieChartData,
-        pieChartConfig
-    )
+            pieChartData,
+            pieChartConfig
+        )
+        Legends (
+            modifier = Modifier.height(100.dp),
+            legendsConfig = LegendsConfig(
+                legendLabelList = listOf(
+                    LegendLabel(
+                        color = MaterialTheme.colorScheme.primary,
+                        name = "Reached the goal"
+                    ),
+                    LegendLabel(
+                        color = MaterialTheme.colorScheme.secondary,
+                        name = "Didn't reach the goal"
+                    )
+                ),
+                legendsArrangement =  Arrangement.Start
+            )
+        )
+
+    }
 }
 
 @Composable
@@ -428,8 +481,8 @@ fun ShowBar(viewModel: StatisticsViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         ShowBarChart(viewModel)
-        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
-        DatePickerButton(viewModel)
+     //   Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+      //  DatePickerButton(viewModel)
 //        Row {
 //            Spacer(modifier = Modifier.width(20.dp))
 //            DatePickerButton(viewModel)

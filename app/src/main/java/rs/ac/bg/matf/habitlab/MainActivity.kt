@@ -252,10 +252,11 @@ fun NumberTask(viewModel: StateHolder, habit: Habit) {
                     },
                     modifier = Modifier
                         .width(50.dp)
-                        .padding(bottom = 7.dp),
+                        .padding(bottom = 7.dp)
+                        ,
 
                 ) {
-                    Text(text = viewModel.numbersState[habit]?.get(i).toString())
+                    Text(text = viewModel.numbersState[habit]?.get(i).toString(), fontSize = 20.sp)
                 }
             }
         }
@@ -315,7 +316,7 @@ fun NumberDialog(viewModel: StateHolder, habit: Habit, i: Int, showDialog: Mutab
 @Composable
 fun ShowDays() {
     val firstDayToShow = LocalDate.now().minusDays(6)
-    val formatter = DateTimeFormatter.ofPattern("MM/dd")
+    val formatter = DateTimeFormatter.ofPattern("dd/MM")
     Row (modifier = Modifier.fillMaxWidth().padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween){
         repeat(7) {
