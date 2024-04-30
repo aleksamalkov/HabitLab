@@ -11,12 +11,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
+import java.time.Duration
 import java.time.LocalDate
 import kotlin.math.max
 
 class StatisticsViewModel (private val dataRepository: DataRepository, val habit: Habit) : ViewModel() {
     val today: LocalDate = LocalDate.now()
     val pieRatio = mutableFloatStateOf(0.0F)
+    val goalRatio = mutableFloatStateOf(0.0F)
     val barData = mutableStateListOf<Int>()
     val startDate = mutableStateOf(today.minusDays(6))
     val endDate = mutableStateOf(today)
@@ -83,6 +85,7 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     private suspend fun refreshCharts() {
         if (habit.isNumeric) {
             refreshBarChart()
+            refreshNumPieChart()
         } else {
             refreshPieChart()
         }
@@ -90,6 +93,9 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
 
     private suspend fun refreshPieChart() {
         pieRatio.floatValue = dataRepository.getDoneRatio(habit, startDate.value, endDate.value)
+    }
+    private suspend fun refreshNumPieChart() {
+        goalRatio.floatValue = dataRepository.getGoalRatio(habit, startDate.value, endDate.value)
     }
 
     private suspend fun refreshBarChart() {

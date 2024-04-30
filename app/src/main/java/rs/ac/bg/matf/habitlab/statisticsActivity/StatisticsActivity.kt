@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
@@ -104,11 +105,15 @@ class StatisticsActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
+                            item{
+                           //     Text(text = "Daily goal: %d".format(viewModel.habit.goal.toString()))
+                            }
                             item {
                                 ShowCalendar(viewModel)
                             }
                             if (viewModel.habit.isNumeric) {
                                 item { ShowBar(viewModel) }
+                                item { ShowNumPie(viewModel) }
                             } else {
                                 item { ShowPie(viewModel) }
 
@@ -337,6 +342,59 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
             PieChartData.Slice(
                 "Not done",
                 (1 - viewModel.pieRatio.floatValue) * 100,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+
+        ),
+        plotType = PlotType.Pie
+    )
+    val pieChartConfig = PieChartConfig(
+
+        labelVisible = true,
+        sliceLabelTextSize = 10.sp,
+        isAnimationEnable = true,
+        showSliceLabels = true,
+        animationDuration = 1500,
+        backgroundColor = MaterialTheme.colorScheme.background,
+    )
+
+    PieChart(
+        modifier = Modifier
+            .width(250.dp)
+            .height(250.dp),
+
+        pieChartData,
+        pieChartConfig
+    )
+}
+
+@Composable
+fun ShowNumPie(viewModel: StatisticsViewModel) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+//        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+        ShowNumPieChart(viewModel)
+        //Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+        Row{
+            Spacer(modifier = Modifier.width(20.dp))
+          //  DatePickerButton(viewModel)
+        }
+    }
+}
+
+@Composable
+fun ShowNumPieChart(viewModel: StatisticsViewModel) {
+    val pieChartData = PieChartData(
+        slices = listOf(
+            PieChartData.Slice(
+                "Goal",
+                viewModel.goalRatio.floatValue * 100,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            PieChartData.Slice(
+                "Not goal",
+                (1 - viewModel.goalRatio.floatValue) * 100,
                 color = MaterialTheme.colorScheme.secondary,
             )
 
