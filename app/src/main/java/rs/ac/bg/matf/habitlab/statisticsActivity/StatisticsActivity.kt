@@ -381,7 +381,7 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
             pieChartConfig
         )
         Legends (
-            modifier = Modifier.height(100.dp),
+            modifier = Modifier.height(250.dp),
     legendsConfig = LegendsConfig(
         legendLabelList = listOf(
             LegendLabel(
@@ -455,7 +455,7 @@ fun ShowNumPieChart(viewModel: StatisticsViewModel) {
             pieChartConfig
         )
         Legends (
-            modifier = Modifier.height(100.dp),
+            modifier = Modifier.height(250.dp),
             legendsConfig = LegendsConfig(
                 legendLabelList = listOf(
                     LegendLabel(
