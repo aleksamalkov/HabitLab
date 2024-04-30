@@ -1,64 +1,60 @@
 package rs.ac.bg.matf.habitlab
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
-import rs.ac.bg.matf.habitlab.data.AppDatabase
-import rs.ac.bg.matf.habitlab.data.DataRepository
-import rs.ac.bg.matf.habitlab.data.Habit
-import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Switch
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import android.content.Intent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import rs.ac.bg.matf.habitlab.data.AppDatabase
+import rs.ac.bg.matf.habitlab.data.DataRepository
+import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.statisticsActivity.StatisticsActivity
+import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +62,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var stateHolder: StateHolder
     private lateinit var db: AppDatabase
 
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,7 +74,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     Scaffold (
-                        Modifier.padding(10.dp),
                         topBar = {ShowDays()},
                         floatingActionButton = {
                                 FloatingActionButton(
@@ -96,7 +90,8 @@ class MainActivity : ComponentActivity() {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(innerPadding)
+                                .padding(innerPadding),
+                            contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
                             items(stateHolder.habits) { task ->
                                 if (task.isNumeric) {
@@ -123,52 +118,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Tmp(stateHolder: StateHolder) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        val switchState = remember { mutableStateOf(false) }
-        Switch(
-            checked = switchState.value,
-            onCheckedChange = { isChecked ->
-                switchState.value = isChecked
-            })
-        AddTaskButton(switchState.value) {
-            stateHolder.addHabit(!switchState.value)
-        }
-
-        TextField(value = stateHolder.textFieldString.value,
-            onValueChange = { stateHolder.textFieldString.value = it },
-            modifier = Modifier
-                .width(120.dp)
-                .height(50.dp),
-            label = { Text("Name") })
-
-        TextField(value = stateHolder.goalString.value,
-            onValueChange = {
-                val pattern = Regex("[0-9]+")
-                if (it.matches(pattern)) {
-                    stateHolder.goalString.value = it
-                } else{
-                    stateHolder.goalString.value = ""
-                }},
-            modifier = Modifier
-                .width(80.dp)
-                .height(50.dp),
-            enabled = !(switchState.value),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text("Goal") })
-
-    }
-}
-
-@Composable
 fun HabitDialog(stateHolder: StateHolder) {
-    val name = remember { mutableStateOf("") }
-    val goal = remember { mutableStateOf("") }
     Dialog(onDismissRequest = { stateHolder.showHabitDialog.value = false }) {
         Card(
             modifier = Modifier
@@ -282,8 +232,6 @@ fun AddTaskButton(isNumeric: Boolean, onClick: () -> Unit) {
     }
 }
 
-// TODO ovo treba promeniti tako da se stanje cuva u StateHolder klasi i poziva funkcija odande
-// TODO  za on value change, slicno kao kod BinaryTask
 @Composable
 fun NumberTask(viewModel: StateHolder, habit: Habit) {
     Column {
@@ -292,15 +240,67 @@ fun NumberTask(viewModel: StateHolder, habit: Habit) {
             horizontalArrangement = Arrangement.SpaceBetween){
             repeat(7) {i ->
 
-                TextField(
-                    value = if (viewModel.numbersState[habit]?.get(i).toString() == "0")  "" else viewModel.numbersState[habit]?.get(i).toString() ,
-                    onValueChange = { viewModel.onValueChange(habit, i, it)},
-                    textStyle = TextStyle(fontSize = 14.sp),
+                val showDialog = remember{ mutableStateOf(false) }
+                if (showDialog.value) {
+                    NumberDialog(viewModel = viewModel, habit = habit, i = i, showDialog)
+                }
+
+                TextButton(
+                    onClick = {
+                        viewModel.numberField.value = viewModel.numbersState[habit]?.get(i).toString()
+                        showDialog.value = true
+                    },
                     modifier = Modifier
                         .width(50.dp)
                         .padding(bottom = 7.dp),
+
+                ) {
+                    Text(text = viewModel.numbersState[habit]?.get(i).toString())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NumberDialog(viewModel: StateHolder, habit: Habit, i: Int, showDialog: MutableState<Boolean>) {
+    Dialog(onDismissRequest = {showDialog.value = false}) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(habit.name, modifier = Modifier.padding(10.dp))
+                Text(viewModel.today.toString(), modifier = Modifier.padding(10.dp))
+                TextField(
+                    value = viewModel.numberField.value,
+                    onValueChange = { viewModel.numberField.value = it },
+                    textStyle = TextStyle(textAlign = TextAlign.Center),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(10.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
+                Row (modifier = Modifier.padding(10.dp)) {
+                    TextButton(onClick = { showDialog.value = false }) {
+                        Text("Cancel")
+                    }
+                    TextButton(
+                        onClick = {
+                            showDialog.value = false
+                            viewModel.changeNumber(habit, i)
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                }
             }
         }
     }
@@ -316,9 +316,9 @@ fun NumberTask(viewModel: StateHolder, habit: Habit) {
 fun ShowDays() {
     val firstDayToShow = LocalDate.now().minusDays(6)
     val formatter = DateTimeFormatter.ofPattern("MM/dd")
-    Row (modifier = Modifier.fillMaxWidth(),
+    Row (modifier = Modifier.fillMaxWidth().padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween){
-        repeat(7) {it ->
+        repeat(7) {
             Text(text = firstDayToShow.plusDays(it.toLong()).format(formatter))
         }
     }

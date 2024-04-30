@@ -18,7 +18,7 @@ import java.time.LocalDate
 class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // lista taskova
     val habits = mutableStateListOf<Habit>()
-    // stanje checkboxova TODO dodati slicno za numericke
+    // stanje checkboxova
     val checkedState = mutableStateMapOf<Habit, SnapshotStateList<Boolean>>()
     // stanje textfieldova za numericke taskove
     val numbersState = mutableStateMapOf<Habit, SnapshotStateList<Int>>()
@@ -28,6 +28,8 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     val goalString = mutableStateOf("")
     // danasnji dan
     val today: LocalDate = LocalDate.now()
+
+    val numberField = mutableStateOf("")
 
     val showHabitDialog = mutableStateOf(false)
     val snackbarHostState = SnackbarHostState()
@@ -77,7 +79,6 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     }
 
     // akcija koja se desava kad uradimo ili "oduradimo" binarni zadatak
-    // TODO isto treba napraviti i za numericke
     fun onCheckedChange(habit: Habit, i: Int, value: Boolean) {
         val date = today.minusDays((6 - i).toLong())
         viewModelScope.launch {
@@ -86,15 +87,15 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
         }
     }
 
-    fun onValueChange(habit: Habit, i: Int, value: String){
+    fun changeNumber(habit: Habit, i: Int){
         val date = today.minusDays((6 - i).toLong())
         val pattern = Regex("[0-9]+\\s*")
         viewModelScope.launch {
-            if(value == "" || !value.matches(pattern)){
-                dataRepository.updateNumeric(habit, date, 0)
+            if(numberField.value == "" || !numberField.value.matches(pattern)){
+                snackbarHostState.showSnackbar("Invalid number")
             }
             else{
-                dataRepository.updateNumeric(habit, date, value.trim().toInt())
+                dataRepository.updateNumeric(habit, date, numberField.value.trim().toInt())
             }
             refreshNumeric(habit)
         }
@@ -108,7 +109,6 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
 
     // osvezavanje liste navika
     // poziva se kada se otvra activity i kada se dodaje/uklanja navika
-    // TODO dodati osvezavanje numerickih navika kada se implementira
     private suspend fun refresh() {
         val newHabits = dataRepository.allHabits()
         for (habit in newHabits) {
@@ -124,7 +124,6 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     }
 
     // osvezavanje interfejsa kada se uradi neki binarni zadatak za binarnu naviku 'habit'
-    // TODO isto treba napraviti i za numericke
     private suspend fun refreshBinary(habit: Habit) {
         val execs = mutableStateListOf<Boolean>()
         val newExecs = dataRepository.getBinaryExecutions(habit, today.minusDays(6), today)
