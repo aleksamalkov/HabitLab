@@ -33,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
@@ -106,10 +105,9 @@ class StatisticsActivity : ComponentActivity() {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(innerPadding)
-                                .padding(10.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-
+                                .padding(innerPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
 
                             item {
@@ -523,7 +521,6 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
         .axisLineColor(MaterialTheme.colorScheme.onBackground)
         .build()
 
-    // TODO popraviti za veliko max
     val max = data.maxOrNull() ?: 1
     val yAxisData = AxisData.Builder()
         .steps(max)

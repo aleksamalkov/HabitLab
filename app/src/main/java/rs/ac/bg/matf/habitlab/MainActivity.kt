@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,14 +62,15 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var stateHolder: StateHolder
+    private lateinit var viewModel: MainViewModel
     private lateinit var db: AppDatabase
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         db = AppDatabase.getInstance(applicationContext)
-        stateHolder = StateHolder(DataRepository(db.habitDao(), db.occurrenceDao()))
+        viewModel = MainViewModel(DataRepository(db.habitDao(), db.occurrenceDao()))
 
         setContent {
             HabitLabTheme {
@@ -74,18 +78,31 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     Scaffold (
-                        topBar = {ShowDays()},
+                        topBar = {
+                            Column {
+                                TopAppBar(
+                                    title = {
+                                        Text(
+                                            text = "HabitLab",
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                )
+                                ShowDays()
+                            }
+                        },
                         floatingActionButton = {
                                 FloatingActionButton(
-                                    onClick = { stateHolder.showHabitDialog.value = true },
+                                    onClick = { viewModel.showHabitDialog.value = true },
                                 ) {
                                     Icon(Icons.Filled.Add, "Floating action button.")
-                                    if (stateHolder.showHabitDialog.value) {
-                                        HabitDialog(stateHolder)
+                                    if (viewModel.showHabitDialog.value) {
+                                        HabitDialog(viewModel)
                                     }
                                 }
                         },
-                        snackbarHost = { SnackbarHost(hostState = stateHolder.snackbarHostState) },
+                        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
                     ) { innerPadding ->
                         LazyColumn(
                             modifier = Modifier
@@ -93,11 +110,11 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding),
                             contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
-                            items(stateHolder.habits) { task ->
+                            items(viewModel.habits) { task ->
                                 if (task.isNumeric) {
-                                    NumberTask(stateHolder, task)
+                                    NumberTask(viewModel, task)
                                 } else {
-                                    BinaryTask(stateHolder, task)
+                                    BinaryTask(viewModel, task)
                                 }
                                 HorizontalDivider()
                             }
@@ -113,13 +130,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        stateHolder.refreshView()
+        viewModel.refreshView()
     }
 }
 
 @Composable
-fun HabitDialog(stateHolder: StateHolder) {
-    Dialog(onDismissRequest = { stateHolder.showHabitDialog.value = false }) {
+fun HabitDialog(viewModel: MainViewModel) {
+    Dialog(onDismissRequest = { viewModel.showHabitDialog.value = false }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,8 +154,8 @@ fun HabitDialog(stateHolder: StateHolder) {
 
                 Text(text = "New Habit")
 
-                TextField(value = stateHolder.textFieldString.value,
-                    onValueChange = { stateHolder.textFieldString.value = it },
+                TextField(value = viewModel.textFieldString.value,
+                    onValueChange = { viewModel.textFieldString.value = it },
                     modifier = Modifier
                         .padding(10.dp)
                         .width(200.dp),
@@ -158,13 +175,13 @@ fun HabitDialog(stateHolder: StateHolder) {
 
                 if (switchState.value) {
                     TextField(
-                        value = stateHolder.goalString.value,
+                        value = viewModel.goalString.value,
                         onValueChange = {
                             val pattern = Regex("[0-9]+")
                             if (it.matches(pattern)) {
-                                stateHolder.goalString.value = it
+                                viewModel.goalString.value = it
                             } else {
-                                stateHolder.goalString.value = ""
+                                viewModel.goalString.value = ""
                             }
                         },
                         enabled = switchState.value,
@@ -177,12 +194,12 @@ fun HabitDialog(stateHolder: StateHolder) {
                 }
 
                 Row (modifier = Modifier.padding(10.dp)) {
-                    TextButton(onClick = { stateHolder.showHabitDialog.value = false }) {
+                    TextButton(onClick = { viewModel.showHabitDialog.value = false }) {
                         Text("Cancel")
                     }
                     AddTaskButton(switchState.value) {
-                        stateHolder.addHabit(switchState.value)
-                        stateHolder.showHabitDialog.value = false
+                        viewModel.addHabit(switchState.value)
+                        viewModel.showHabitDialog.value = false
                     }
                 }
             }
@@ -191,7 +208,7 @@ fun HabitDialog(stateHolder: StateHolder) {
 }
 
 @Composable
-fun BinaryTask(viewModel: StateHolder, habit: Habit) {
+fun BinaryTask(viewModel: MainViewModel, habit: Habit) {
     Column {
         StatisticsButton(habit)
 //        Text(text = habit.name)
@@ -233,7 +250,7 @@ fun AddTaskButton(isNumeric: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun NumberTask(viewModel: StateHolder, habit: Habit) {
+fun NumberTask(viewModel: MainViewModel, habit: Habit) {
     Column {
         StatisticsButton(habit)
         Row (modifier = Modifier.fillMaxWidth(),
@@ -264,7 +281,7 @@ fun NumberTask(viewModel: StateHolder, habit: Habit) {
 }
 
 @Composable
-fun NumberDialog(viewModel: StateHolder, habit: Habit, i: Int, showDialog: MutableState<Boolean>) {
+fun NumberDialog(viewModel: MainViewModel, habit: Habit, i: Int, showDialog: MutableState<Boolean>) {
     Dialog(onDismissRequest = {showDialog.value = false}) {
         Card(
             modifier = Modifier

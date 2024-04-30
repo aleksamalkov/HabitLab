@@ -15,14 +15,14 @@ interface HabitDao {
     suspend fun insert(habit: Habit)
 
     @Delete
-    abstract fun deleteHabit(habit: Habit)
+    fun deleteHabit(habit: Habit)
 
     @Query(
         "DELETE " +
         "FROM occurrence " +
         "WHERE habitId = :id "
     )
-    abstract fun deleteOccurrences(id: Int)
+    fun deleteOccurrences(id: Int)
 
     @Transaction
     suspend fun delete(habit: Habit) {

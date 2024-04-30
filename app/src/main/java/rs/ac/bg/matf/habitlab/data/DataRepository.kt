@@ -79,14 +79,13 @@ class DataRepository (private val habitDao: HabitDao, private val occurrenceDao:
 
             var countGoal = 0
             val goal = habit.goal ?: 0
-            for ((key,value) in getScorePerDate(habit,from,until)) {
+            for ((_,value) in getScorePerDate(habit,from,until)) {
                 if (value >= goal)
                     countGoal += 1
             }
-            return (countGoal.toFloat()/ (Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1)).toFloat()
+            return (countGoal.toFloat()/ (Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1))
 
     }
-
 
     suspend fun getDoneRatio(habit: Habit, today: LocalDate): Float {
         val date = occurrenceDao.firstDate(habit.id)

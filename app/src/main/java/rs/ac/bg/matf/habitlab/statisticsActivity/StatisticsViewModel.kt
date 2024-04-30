@@ -11,7 +11,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
-import java.time.Duration
 import java.time.LocalDate
 import kotlin.math.max
 
