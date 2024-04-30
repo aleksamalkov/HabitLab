@@ -40,6 +40,15 @@ Na pie chart-u je prikazano koliko često ste ispunjavali cilj u nekom vremensko
 Za numeričke navike je prikazan i bar chart.
 Vremenski period prikazan na njima je moguće menjati klikom na dugme "Pick range".
 
+## Screenshots
+<p float="left">
+<img src="screenshots/Screenshot_main.png" alt="main" width="17%"/>
+<img src="screenshots/Screenshot_newHabit.png" alt="add new habit" width="17%"/> 
+<img src="screenshots/Screenshot_statistics1.png" alt="statistics1" width="17%"/> 
+<img src="screenshots/Screenshot_statistics2.png" alt="statistics2" width="17%"/> 
+<img src="screenshots/Screenshot_delete.png" alt="delete" width="17%"/> 
+</p>
+
 ## Autori
 Iva Ninčić
 
