@@ -28,6 +28,8 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // danasnji dan
     val today: LocalDate = LocalDate.now()
 
+    val showHabitDialog = mutableStateOf(false)
+
     private val mutex = Mutex()
 
     init {
