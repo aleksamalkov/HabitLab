@@ -51,6 +51,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
@@ -74,7 +75,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             HabitLabTheme {
-                // ovo je vljd za dizajn, nisam sigurna
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                 ) {
@@ -90,7 +90,8 @@ class MainActivity : ComponentActivity() {
                                         HabitDialog(stateHolder)
                                     }
                                 }
-                        }
+                        },
+                        snackbarHost = { SnackbarHost(hostState = stateHolder.snackbarHostState) },
                     ) { innerPadding ->
                         LazyColumn(
                             modifier = Modifier
@@ -136,7 +137,6 @@ fun Tmp(stateHolder: StateHolder) {
                 switchState.value = isChecked
             })
         AddTaskButton(switchState.value) {
-            // TODO ova funkcija opciono prihvata vrednost cilja kao drugi argument
             stateHolder.addHabit(!switchState.value)
         }
 
@@ -230,9 +230,6 @@ fun HabitDialog(stateHolder: StateHolder) {
                     TextButton(onClick = { stateHolder.showHabitDialog.value = false }) {
                         Text("Cancel")
                     }
-//                    TextButton(onClick = {}) {
-//                        Text("Create")
-//                    }
                     AddTaskButton(switchState.value) {
                         stateHolder.addHabit(switchState.value)
                         stateHolder.showHabitDialog.value = false

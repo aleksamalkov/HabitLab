@@ -1,5 +1,6 @@
 package rs.ac.bg.matf.habitlab
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     val today: LocalDate = LocalDate.now()
 
     val showHabitDialog = mutableStateOf(false)
+    val snackbarHostState = SnackbarHostState()
 
     private val mutex = Mutex()
 
@@ -39,21 +41,38 @@ class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
     // dodavanje navike u bazu i osvezavanje interfejsa
     fun addHabit(isNumeric: Boolean) {
         val taskName = textFieldString.value
-        var goal = 0
-        val pattern = Regex("[0-9]+")
-        if (isNumeric && goalString.value.trim().matches(pattern))
-            goal = goalString.value.trim().toInt()
-        if (taskName.isNotBlank()) {
+        if (taskName.isBlank()) {
+            viewModelScope.launch {
+                snackbarHostState.showSnackbar("Invalid habit name")
+            }
             textFieldString.value = ""
             goalString.value = ""
-            viewModelScope.launch {
-                if (isNumeric) {
-                    dataRepository.addNumericHabit(taskName, goal)
-                } else {
-                    dataRepository.addBinaryHabit(taskName)
+            return
+        }
+
+        var goal = 0
+        val pattern = Regex("[0-9]+")
+        if (isNumeric) {
+            if (goalString.value.trim().matches(pattern)) {
+                goal = goalString.value.trim().toInt()
+            } else {
+                viewModelScope.launch {
+                    snackbarHostState.showSnackbar("Invalid goal")
                 }
-                refresh()
+                textFieldString.value = ""
+                goalString.value = ""
+                return
             }
+        }
+        viewModelScope.launch {
+            if (isNumeric) {
+                dataRepository.addNumericHabit(taskName, goal)
+            } else {
+                dataRepository.addBinaryHabit(taskName)
+            }
+            textFieldString.value = ""
+            goalString.value = ""
+            refresh()
         }
     }
 
