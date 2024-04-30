@@ -15,7 +15,7 @@ import rs.ac.bg.matf.habitlab.data.Habit
 import java.time.LocalDate
 
 
-class StateHolder (private val dataRepository: DataRepository) : ViewModel() {
+class MainViewModel (private val dataRepository: DataRepository) : ViewModel() {
     // lista taskova
     val habits = mutableStateListOf<Habit>()
     // stanje checkboxova
