@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -99,7 +100,9 @@ class StatisticsActivity : ComponentActivity() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(innerPadding)
-                                .padding(10.dp)
+                                .padding(10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+
                         ) {
                             item {
                                 ShowCalendar(viewModel)
@@ -127,7 +130,7 @@ fun ReturnButton() {
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Unazad",
+            contentDescription = "Return",
         )
     }
 }
@@ -181,7 +184,7 @@ fun RemoveButton(viewModel: StatisticsViewModel) {
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = "Obrisi",
+            contentDescription = "Remove",
         )
     }
 
@@ -309,13 +312,16 @@ fun DatePickerButton(viewModel: StatisticsViewModel) {
 
 @Composable
 fun ShowPie(viewModel: StatisticsViewModel) {
-    Column {
-        Row {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+//        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+        ShowPieChart(viewModel)
+        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+        Row{
             Spacer(modifier = Modifier.width(20.dp))
             DatePickerButton(viewModel)
         }
-        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
-        ShowPieChart(viewModel)
     }
 }
 
@@ -324,12 +330,12 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
     val pieChartData = PieChartData(
         slices = listOf(
             PieChartData.Slice(
-                "Uradjeno",
+                "Done",
                 viewModel.pieRatio.floatValue * 100,
                 color = MaterialTheme.colorScheme.primary
             ),
             PieChartData.Slice(
-                "Nije",
+                "Not done",
                 (1 - viewModel.pieRatio.floatValue) * 100,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -360,13 +366,16 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
 @Composable
 fun ShowBar(viewModel: StatisticsViewModel) {
 
-    Column {
-        Row {
-            Spacer(modifier = Modifier.width(20.dp))
-            DatePickerButton(viewModel)
-        }
-        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
         ShowBarChart(viewModel)
+        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+        DatePickerButton(viewModel)
+//        Row {
+//            Spacer(modifier = Modifier.width(20.dp))
+//            DatePickerButton(viewModel)
+//        }
     }
 }
 
@@ -381,7 +390,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
 
     var date = viewModel.startDate.value
     var x = 0f
-    val formatter = DateTimeFormatter.ofPattern("MM-dd")
+    val formatter = DateTimeFormatter.ofPattern("dd-MM")
     for (i in data) {
         barsData.add(BarData(
             Point(x, i.toFloat()),
@@ -424,6 +433,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
     )
 
     BarChart(modifier = Modifier
-        .height(350.dp)
-        .fillMaxWidth(), barChartData = barChartData)
+        .height(450.dp)
+        .fillMaxWidth(),
+        barChartData = barChartData)
 }
