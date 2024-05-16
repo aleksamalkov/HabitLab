@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DisplayMode
@@ -30,9 +33,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
@@ -43,6 +48,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +74,7 @@ import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -101,6 +110,7 @@ class StatisticsActivity : ComponentActivity() {
                                 actions = { RemoveButton(viewModel) },
                             )
                         },
+                        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
                     ){ innerPadding ->
                         LazyColumn(
                             modifier = Modifier
@@ -210,6 +220,86 @@ fun RemoveButton(viewModel: StatisticsViewModel) {
 }
 
 @Composable
+fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
+    val isChecked = remember {
+        val num: Int? = viewModel.scorePerDate[date]
+        if (num != null)
+            mutableStateOf(num > 0)
+        else
+            mutableStateOf(false)
+    }
+    val numField = remember { mutableStateOf(viewModel.scorePerDate[date]?.toString() ?: "0") }
+
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Edit, contentDescription = "Edit entry")
+        },
+        title = {
+            Text(text = date.toString()) // TODO: format date
+        },
+        text = {
+            Column(
+                Modifier.fillMaxWidth()
+            ) {
+                if (viewModel.habit.isNumeric) {
+
+                    TextField(
+                        value = numField.value,
+                        onValueChange = { numField.value = it },
+                        textStyle = TextStyle(textAlign = TextAlign.Center),
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(10.dp)
+                            .align(Alignment.CenterHorizontally),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                } else {
+                    Row (Modifier.align(Alignment.CenterHorizontally).padding(10.dp)) {
+                        Checkbox(
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            checked = isChecked.value,
+                            onCheckedChange = { isChecked.value = it },
+                        )
+                        Text(
+                                "Done",
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                                fontWeight = FontWeight.Bold
+                            )
+                    }
+                }
+            }
+        },
+        onDismissRequest = {
+            viewModel.selectedDate.value = null
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (viewModel.habit.isNumeric) {
+                        viewModel.updateNumeric(date, numField.value)
+                    } else {
+                        viewModel.updateBinary(date, isChecked.value)
+                    }
+                    viewModel.selectedDate.value = null
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    viewModel.selectedDate.value = null
+                }
+            ) {
+                Text("Dismiss")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.primaryContainer
+    )
+}
+
+@Composable
 fun ShowCalendar(viewModel: StatisticsViewModel) {
     val endDate = viewModel.today
     val startDate = endDate.minusMonths(12)
@@ -236,6 +326,9 @@ fun ShowCalendar(viewModel: StatisticsViewModel) {
                     endDate = endDate,
                     week = week,
                     level = data[day.date] ?: HeatLevel.Zero,
+                    onClick = {date ->
+                        viewModel.selectedDate.value = date
+                    },
                 )
             },
             weekHeader = { WeekHeader(it) },
@@ -248,6 +341,10 @@ fun ShowCalendar(viewModel: StatisticsViewModel) {
                     .padding(horizontal = 44.dp),
             )
         }
+    }
+    val date = viewModel.selectedDate.value
+    if (date != null) {
+        EditDialog(viewModel, date)
     }
 }
 

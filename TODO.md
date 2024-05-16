@@ -1,5 +1,22 @@
 # TODO
 
+## Dopune
+1. - [ ] ispraviti pogresan datum u dijalogu za menjanje vrednosti kod numerickih navika (prikazan je danasnji umesto odabranog)
+2. - [ ] videti kako se moze popraviti izgled pie chart-a?
+3. - [ ] crvena boja za not done
+4. - [x] pregledanje/modifikovanje starijih podataka
+- [ ] ikonica ako je neko inpirisan
+- [ ] datumi na nekim mestima nisu formatirani
+- [ ] mozda da i u bar chart-u budu razlicito obojeni ako jeste ili nije predjen cilj?
+- [ ] mozda promeniti izgled dijaloga na prvoj strani da se bolje slazu sa dijalozima na drugoj?
+
+## Na kraju
+- [ ] azurirati screenshot-e
+- [ ] azurirati uputstvo za upotrebu
+- [ ] napraviti novi release
+
+# DONE
+
 ## MainActivity
 - [x] pravljenje nove navike tako da korisnik moze da izabere da li je numericka ili binarna
 - [x] unosenje cilja za numericke
@@ -10,7 +27,7 @@
 - [x] text field za brojeve
 - [x] pokretanje drugog activity-a kada se klikne naziv neke navike
 - [x] slanje habit objekta activity-u koji se pokrece
-- [ ] prikazivanje 0 (mozda i bolje ovako?)
+- [x] prikazivanje 0 (mozda i bolje ovako?)
 - [x] delovi koji ne treba da se skroluju
 - [x] red sa datumima ne treba da bude providan
 - [x] aplikacija puca kada se text field za broj unese enter?
@@ -20,7 +37,7 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 - [x] napraviti klasu za activity
 - [x] napraviti klasu koja nasledjuje ViewModel u kojoj ce se cuvati stanje
 - [x] naziv navike
-- [ ] cilj za numercike navike
+- [x] cilj za numercike navike
 - [x] kalendar
     - [x] UI
     - [x] data
@@ -28,17 +45,15 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
     - [x] UI
     - [x] data
     - [x] biranje perioda
-- [ ] bar chart
+- [x] bar chart
     - [x] UI
     - [x] data
-    - [ ] skaliranje y ose za velike brojeve
     - [x] biranje perioda
-- [ ] streak (trenutni i/ili najbolji) (mozda nam i ne treba?)
 - [x] dugme za vracanje na MainActivity (pozivom funkcije finish())
-- [ ] dugme za brisanje navike
+- [x] dugme za brisanje navike
     - [x] UI
     - [x] implementacija
-    - [ ] "da li ste sigurni?" dijalog
+    - [x] "da li ste sigurni?" dijalog
 - [x] polozaji i ikonice dugmica (Iva)
 - [x] skrolovanje stvari (Iva)
 - [x] spojiti dva aktivitija
@@ -46,6 +61,6 @@ drugi activity koji ce prikazivati statistike za neku konkretnu naviku
 ## Ostalo
 - [x] popraviti pozadinu kad je ukljucena tamna tema
 - [x] materialTheme cudno ponasanje
-- [ ] napisati README.md
-- [ ] prebaciti repo na public
-    - [ ] preimenovati repozitorijum
+- [x] napisati README.md
+- [x] prebaciti repo na public
+    - [x] preimenovati repozitorijum

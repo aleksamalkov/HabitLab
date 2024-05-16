@@ -1,6 +1,7 @@
 package rs.ac.bg.matf.habitlab.statisticsActivity
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -83,6 +84,7 @@ fun Day(
     endDate: LocalDate,
     week: HeatMapWeek,
     level: HeatLevel,
+    onClick: (LocalDate) -> Unit,
 ) {
     // We only want to draw boxes on the days that are in the
     // past 12 months. Since the calendar is month-based, we ignore
@@ -92,20 +94,21 @@ fun Day(
     // so the items are laid out properly as the column is top to bottom.
     val weekDates = week.days.map { it.date }
     if (day.date in startDate..endDate) {
-        LevelBox(level.color)
+        LevelBox(level.color) { onClick(day.date) }
     } else if (weekDates.contains(startDate)) {
         LevelBox(Color.Transparent)
     }
 }
 
 @Composable
-private fun LevelBox(color: Color) {
+private fun LevelBox(color: Color, onClick: (() -> Unit)? = null) {
     Box(
         modifier = Modifier
             .size(daySize) // Must set a size on the day.
             .padding(2.dp)
             .clip(RoundedCornerShape(2.dp))
             .background(color = color)
+            .clickable(enabled = onClick != null) { onClick?.invoke() },
     )
 }
 

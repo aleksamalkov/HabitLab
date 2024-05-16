@@ -1,5 +1,6 @@
 package rs.ac.bg.matf.habitlab.statisticsActivity
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -21,8 +22,11 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
     val barData = mutableStateListOf<Int>()
     val startDate = mutableStateOf(today.minusDays(6))
     val endDate = mutableStateOf(today)
+    val scorePerDate = mutableStateMapOf<LocalDate, Int>()
     val calendarData = mutableStateMapOf<LocalDate, HeatLevel>()
     val showDeleteDialog = mutableStateOf(false)
+    val selectedDate = mutableStateOf<LocalDate?>(null)
+    val snackbarHostState = SnackbarHostState()
 
     private val mutex = Mutex()
 
@@ -50,14 +54,17 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
             today
         )
 
+
         val maxValue = newDates.maxOfOrNull { it.second } ?: 0
         val step = max(maxValue / 4, 1)
 
         mutex.withLock {
+            scorePerDate.clear()
             calendarData.clear()
             if (habit.isNumeric) {
                 for (pair in newDates) {
                     val category = (step + pair.second - 1) / step
+                    scorePerDate[pair.first] = pair.second
                     calendarData[pair.first] = when (category) {
                         0 -> HeatLevel.Zero
                         1 -> HeatLevel.One
@@ -69,6 +76,7 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
             }
             else {
                 for (pair in newDates) {
+                    scorePerDate[pair.first] = pair.second
                     calendarData[pair.first] = if (pair.second == 1) HeatLevel.Four else HeatLevel.Zero
                 }
             }
@@ -102,6 +110,26 @@ class StatisticsViewModel (private val dataRepository: DataRepository, val habit
         mutex.withLock {
             barData.clear()
             barData.addAll(newBarData)
+        }
+    }
+
+    fun updateBinary(date: LocalDate, value: Boolean) {
+        viewModelScope.launch {
+            dataRepository.updateBinary(habit, date, value)
+            refresh()
+        }
+    }
+
+    fun updateNumeric(date: LocalDate, numberField: String){
+        val pattern = Regex("[0-9]+\\s*")
+        viewModelScope.launch {
+            if(numberField == "" || !numberField.matches(pattern)){
+                snackbarHostState.showSnackbar("Invalid number")
+            }
+            else{
+                dataRepository.updateNumeric(habit, date, numberField.trim().toInt())
+            }
+            refresh()
         }
     }
 }
