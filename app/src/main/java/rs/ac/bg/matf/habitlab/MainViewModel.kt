@@ -55,7 +55,7 @@ class MainViewModel (private val dataRepository: DataRepository) : ViewModel() {
         var goal = 0
         val pattern = Regex("[0-9]+")
         if (isNumeric) {
-            if (goalString.value.trim().matches(pattern)) {
+            if (goalString.value.trim().matches(pattern) && goalString.value.trim().toInt() > 0) {
                 goal = goalString.value.trim().toInt()
             } else {
                 viewModelScope.launch {
