@@ -15,13 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +29,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
@@ -50,7 +51,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import rs.ac.bg.matf.habitlab.data.AppDatabase
 import rs.ac.bg.matf.habitlab.data.DataRepository
 import rs.ac.bg.matf.habitlab.data.Habit
@@ -141,25 +141,30 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HabitDialog(viewModel: MainViewModel) {
-    Dialog(onDismissRequest = { viewModel.showHabitDialog.value = false }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-
+    val switchState = remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = { viewModel.showHabitDialog.value = false },
+        confirmButton = {
+            AddTaskButton(switchState.value) {
+                viewModel.addHabit(switchState.value)
+                viewModel.showHabitDialog.value = false
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { viewModel.showHabitDialog.value = false }) {
+                Text("Cancel")
+            }
+        },
+        icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+        title = {
+            Text(text = "New Habit")
+        },
+        text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val switchState = remember { mutableStateOf(false) }
-
-                Text(text = "New Habit")
-
-                TextField(value = viewModel.textFieldString.value,
+                OutlinedTextField(value = viewModel.textFieldString.value,
                     onValueChange = { viewModel.textFieldString.value = it },
                     modifier = Modifier
                         .padding(10.dp)
@@ -179,7 +184,7 @@ fun HabitDialog(viewModel: MainViewModel) {
                 }
 
                 if (switchState.value) {
-                    TextField(
+                    OutlinedTextField(
                         value = viewModel.goalString.value,
                         onValueChange = {
                             val pattern = Regex("[0-9]+")
@@ -197,19 +202,9 @@ fun HabitDialog(viewModel: MainViewModel) {
                         label = { Text("Goal") },
                     )
                 }
-
-                Row (modifier = Modifier.padding(10.dp)) {
-                    TextButton(onClick = { viewModel.showHabitDialog.value = false }) {
-                        Text("Cancel")
-                    }
-                    AddTaskButton(switchState.value) {
-                        viewModel.addHabit(switchState.value)
-                        viewModel.showHabitDialog.value = false
-                    }
-                }
             }
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -287,20 +282,30 @@ fun NumberTask(viewModel: MainViewModel, habit: Habit) {
 
 @Composable
 fun NumberDialog(viewModel: MainViewModel, habit: Habit, i: Int, showDialog: MutableState<Boolean>) {
-    Dialog(onDismissRequest = {showDialog.value = false}) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    showDialog.value = false
+                    viewModel.changeNumber(habit, i)
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDialog.value = false }) {
+                Text("Cancel")
+            }
+        },
+        icon = { Icon(Icons.Default.Edit, contentDescription = "Edit entry") },
+        title = { Text(habit.name) },
+        text = {
             Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(habit.name, modifier = Modifier.padding(10.dp))
                 val date = viewModel.today.minusDays((6 - i).toLong())
                 val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
                 Text(
@@ -316,22 +321,9 @@ fun NumberDialog(viewModel: MainViewModel, habit: Habit, i: Int, showDialog: Mut
                         .padding(10.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                Row (modifier = Modifier.padding(10.dp)) {
-                    TextButton(onClick = { showDialog.value = false }) {
-                        Text("Cancel")
-                    }
-                    TextButton(
-                        onClick = {
-                            showDialog.value = false
-                            viewModel.changeNumber(habit, i)
-                        }
-                    ) {
-                        Text("OK")
-                    }
-                }
             }
-        }
-    }
+        },
+    )
 }
 
 //@Preview

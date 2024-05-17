@@ -8,7 +8,7 @@
 - [ ] ikonica ako je neko inpirisan
 - [x] datumi na nekim mestima nisu formatirani
 - [ ] mozda da i u bar chart-u budu razlicito obojeni ako jeste ili nije predjen cilj?
-- [ ] mozda promeniti izgled dijaloga na prvoj strani da se bolje slazu sa dijalozima na drugoj?
+- [x] promeniti izgled dijaloga na prvoj strani da se bolje slazu sa dijalozima na drugoj
 
 ## Na kraju
 - [ ] azurirati screenshot-e

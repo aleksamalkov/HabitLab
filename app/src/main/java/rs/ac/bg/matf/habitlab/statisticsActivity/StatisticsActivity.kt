@@ -288,7 +288,7 @@ fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
                     viewModel.selectedDate.value = null
                 }
             ) {
-                Text("Confirm")
+                Text("OK")
             }
         },
         dismissButton = {
@@ -297,10 +297,9 @@ fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
                     viewModel.selectedDate.value = null
                 }
             ) {
-                Text("Dismiss")
+                Text("Cancel")
             }
         },
-        containerColor = MaterialTheme.colorScheme.primaryContainer
     )
 }
 
