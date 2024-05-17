@@ -78,7 +78,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Calendar
+import java.util.Locale
 
 
 class StatisticsActivity : ComponentActivity() {
@@ -88,6 +90,9 @@ class StatisticsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // temporary, so that date formatting is consistent
+        Locale.setDefault(Locale.UK)
 
         db = AppDatabase.getInstance(applicationContext)
         @Suppress("DEPRECATION")
@@ -235,7 +240,7 @@ fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
             Icon(Icons.Default.Edit, contentDescription = "Edit entry")
         },
         title = {
-            Text(text = date.toString()) // TODO: format date
+            Text(text = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
         },
         text = {
             Column(
@@ -429,9 +434,13 @@ fun ShowPie(viewModel: StatisticsViewModel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         ShowPieChart(viewModel)
-        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        val since = viewModel.startDate.value.format(formatter)
+        val until = viewModel.endDate.value.format(formatter)
+        Text(text = "Since $since , until $until.")
+
         Row{
             Spacer(modifier = Modifier.width(20.dp))
             DatePickerButton(viewModel)
@@ -500,12 +509,15 @@ fun ShowNumPie(viewModel: StatisticsViewModel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//        Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         ShowNumPieChart(viewModel)
-        //Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
         Column(horizontalAlignment = Alignment.CenterHorizontally){
             Spacer(modifier = Modifier.width(20.dp))
-            Text(text = "Since ${viewModel.startDate.value} , until ${viewModel.endDate.value}.")
+
+            val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            val since = viewModel.startDate.value.format(formatter)
+            val until = viewModel.endDate.value.format(formatter)
+            Text(text = "Since $since , until $until.")
+
             Spacer(modifier = Modifier.width(20.dp))
             DatePickerButton(viewModel)
         }
@@ -596,7 +608,7 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
 
     var date = viewModel.startDate.value
     var x = 0f
-    val formatter = DateTimeFormatter.ofPattern("dd-MM")
+    val formatter = DateTimeFormatter.ofPattern("dd/MM")
     for (i in data) {
         barsData.add(BarData(
             Point(x, i.toFloat()),

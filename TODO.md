@@ -1,12 +1,12 @@
 # TODO
 
 ## Dopune
-1. - [ ] ispraviti pogresan datum u dijalogu za menjanje vrednosti kod numerickih navika (prikazan je danasnji umesto odabranog)
+1. - [x] ispraviti pogresan datum u dijalogu za menjanje vrednosti kod numerickih navika (prikazan je danasnji umesto odabranog)
 2. - [ ] videti kako se moze popraviti izgled pie chart-a?
 3. - [ ] crvena boja za not done
 4. - [x] pregledanje/modifikovanje starijih podataka
 - [ ] ikonica ako je neko inpirisan
-- [ ] datumi na nekim mestima nisu formatirani
+- [x] datumi na nekim mestima nisu formatirani
 - [ ] mozda da i u bar chart-u budu razlicito obojeni ako jeste ili nije predjen cilj?
 - [ ] mozda promeniti izgled dijaloga na prvoj strani da se bolje slazu sa dijalozima na drugoj?
 

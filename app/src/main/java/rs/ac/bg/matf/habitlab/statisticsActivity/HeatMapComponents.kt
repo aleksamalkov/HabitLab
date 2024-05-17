@@ -23,6 +23,8 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 // In this file are functions used for HeatMapCalendar component.
 // They are modified versions of functions from:
@@ -120,7 +122,7 @@ fun WeekHeader(dayOfWeek: DayOfWeek) {
             .padding(horizontal = 4.dp),
     ) {
         Text(
-            text = dayOfWeek.toString(),
+            text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
             modifier = Modifier.align(Alignment.Center),
             fontSize = 10.sp,
         )
@@ -134,7 +136,7 @@ fun MonthHeader(
 ) {
     if (calendarMonth.weekDays.first().first().date <= endDate) {
         val month = calendarMonth.yearMonth
-        val title = month.month.toString()
+        val title = month.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
         Box(
             modifier = Modifier
                 .fillMaxWidth()

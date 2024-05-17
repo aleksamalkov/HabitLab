@@ -58,6 +58,8 @@ import rs.ac.bg.matf.habitlab.statisticsActivity.StatisticsActivity
 import rs.ac.bg.matf.habitlab.ui.theme.HabitLabTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
@@ -68,6 +70,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // temporary, so that date formatting is consistent
+        Locale.setDefault(Locale.UK)
 
         db = AppDatabase.getInstance(applicationContext)
         viewModel = MainViewModel(DataRepository(db.habitDao(), db.occurrenceDao()))
@@ -296,7 +301,12 @@ fun NumberDialog(viewModel: MainViewModel, habit: Habit, i: Int, showDialog: Mut
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(habit.name, modifier = Modifier.padding(10.dp))
-                Text(viewModel.today.toString(), modifier = Modifier.padding(10.dp))
+                val date = viewModel.today.minusDays((6 - i).toLong())
+                val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+                Text(
+                    date.format(formatter),
+                    modifier = Modifier.padding(10.dp)
+                )
                 TextField(
                     value = viewModel.numberField.value,
                     onValueChange = { viewModel.numberField.value = it },
