@@ -470,7 +470,7 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
         labelVisible = true,
         sliceLabelTextSize = 22.sp,
         isAnimationEnable = true,
-        showSliceLabels = true,
+        showSliceLabels = false,
         animationDuration = 1500,
         backgroundColor = MaterialTheme.colorScheme.background,
     )
@@ -489,11 +489,11 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
         legendLabelList = listOf(
             LegendLabel(
                 color = MaterialTheme.colorScheme.primary,
-                name = "Done"
+                name = "${Math.round(((viewModel.pieRatio.floatValue) * 100).toDouble())}% done"
             ),
             LegendLabel(
                 color = MaterialTheme.colorScheme.secondary,
-                name = "Not done"
+                name = "${Math.round(((1-viewModel.pieRatio.floatValue) * 100).toDouble())}% not done"
             )
         ),
         legendsArrangement =  Arrangement.Start
@@ -546,7 +546,7 @@ fun ShowNumPieChart(viewModel: StatisticsViewModel) {
         labelVisible = true,
         sliceLabelTextSize = 22.sp,
         isAnimationEnable = true,
-        showSliceLabels = true,
+        showSliceLabels = false,
         animationDuration = 1500,
         backgroundColor = MaterialTheme.colorScheme.background,
     )
@@ -566,11 +566,11 @@ fun ShowNumPieChart(viewModel: StatisticsViewModel) {
                 legendLabelList = listOf(
                     LegendLabel(
                         color = MaterialTheme.colorScheme.primary,
-                        name = "Reached the goal"
+                        name = "${Math.round(((viewModel.goalRatio.floatValue) * 100).toDouble())}% reached the goal"
                     ),
                     LegendLabel(
                         color = MaterialTheme.colorScheme.secondary,
-                        name = "Didn't reach the goal"
+                        name = "${Math.round(((1-viewModel.goalRatio.floatValue) * 100).toDouble())}% didn't reach the goal"
                     )
                 ),
                 legendsArrangement =  Arrangement.Start
