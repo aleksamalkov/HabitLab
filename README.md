@@ -7,7 +7,7 @@ Pored pregleda navika koje korisnik treba da izvrši
 u toku dana, aplikacija pruža uvid u statistiku
 izvršavanja navike u izabranom vremenskom periodu.
 
-## Tehnologija
+## Korišćene tehnologije
 Aplikacija je pisana u programskom jeziku Kotlin,
 u razvojnom okruženju Android Studio. Za razvoj
 korisničkog interfejsa korišćen je Jetpack Compose.
@@ -31,14 +31,20 @@ Kada otvorite aplikaciju, klikom na dugme "+" u donjem desnom uglu ekrana možet
 Postoje dve vrste navika:
 binarne navike kojima navodite samo ime i koje treba da obavljate jednom dnevno
 i numeričke za koje treba da navedete cilj, koliko puta dnevno biste želeli to da radite.
+
 Na glavnoj strani možete da menjate podatke o tome šta ste kada i koliko uradili.
-Moguće je menjanje podataka iz poslednjih sedam dana za slučaj da nekog dana zaboravite da popunite šta ste radili.
+Za binarne navike, to se radi označavanjem odgovarajućeg checkbox-a, dok se za numeričke navike to
+radi tako što se dotakne broj za neki dan nakon čega se otvara dijalog u kom se on može promeniti.
+Prikazani su podaci iz poslednjih 7 dana.
 
 Klikom na naziv neke navike, otvara se ekran sa statistikama.
 Tu se prikazuje kalendar na kom je označeno koliko je nešto rađeno kog dana.
+Klikom na neki dan u kalendaru, otvara se dijalog u kom je moguće menjati podatak za taj dan.
 Na pie chart-u je prikazano koliko često ste ispunjavali cilj u nekom vremenskom periodu.
 Za numeričke navike je prikazan i bar chart.
-Vremenski period prikazan na njima je moguće menjati klikom na dugme "Pick range".
+Vremenski period prikazan na njima je poslednjih 7 dana, ali se može menjati klikom na dugme "Pick range".
+
+Klikom na dugme u gornjem desnom uglu, moguće je obrisati naviku.
 
 ## Screenshots
 <p float="left">
