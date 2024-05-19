@@ -43,7 +43,6 @@ Klikom na neki dan u kalendaru, otvara se dijalog u kom je moguće menjati podat
 Na pie chart-u je prikazano koliko često ste ispunjavali cilj u nekom vremenskom periodu.
 Za numeričke navike je prikazan i bar chart.
 Vremenski period prikazan na njima je poslednjih 7 dana, ali se može menjati klikom na dugme "Pick range".
-
 Klikom na dugme u gornjem desnom uglu, moguće je obrisati naviku.
 
 ## Screenshots
