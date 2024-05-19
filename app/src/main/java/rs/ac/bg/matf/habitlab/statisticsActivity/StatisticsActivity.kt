@@ -49,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -259,7 +258,7 @@ fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                 } else {
-                    Row (Modifier.align(Alignment.CenterHorizontally).padding(10.dp)) {
+                    Row (Modifier.align(Alignment.CenterHorizontally)) {
                         Checkbox(
                             modifier = Modifier.align(Alignment.CenterVertically),
                             checked = isChecked.value,
@@ -268,7 +267,6 @@ fun EditDialog(viewModel: StatisticsViewModel, date: LocalDate) {
                         Text(
                                 "Done",
                                 modifier = Modifier.align(Alignment.CenterVertically),
-                                fontWeight = FontWeight.Bold
                             )
                     }
                 }
@@ -485,8 +483,8 @@ fun ShowPieChart(viewModel: StatisticsViewModel) {
         )
         Legends (
             modifier = Modifier.height(250.dp),
-    legendsConfig = LegendsConfig(
-        legendLabelList = listOf(
+            legendsConfig = LegendsConfig(
+            legendLabelList = listOf(
             LegendLabel(
                 color = MaterialTheme.colorScheme.primary,
                 name = "${Math.round(((viewModel.pieRatio.floatValue) * 100).toDouble())}% done"
@@ -611,7 +609,10 @@ fun ShowBarChart(viewModel: StatisticsViewModel){
     for (i in data) {
         barsData.add(BarData(
             Point(x, i.toFloat()),
-            color = MaterialTheme.colorScheme.primary,
+            color = if (i >= (viewModel.habit.goal ?: 0))
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.secondary,
             label = date.format(formatter),
         ))
         x += 1f
