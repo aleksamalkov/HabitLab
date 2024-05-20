@@ -11,7 +11,7 @@
 - [x] promeniti izgled dijaloga na prvoj strani da se bolje slazu sa dijalozima na drugoj
 
 ## Na kraju
-- [ ] azurirati screenshot-e
+- [x] azurirati screenshot-e
 - [x] azurirati uputstvo za upotrebu
 - [ ] napraviti novi release
 
